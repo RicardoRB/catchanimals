@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 public class MainMenuScreen implements Screen {
 
@@ -18,9 +17,7 @@ public class MainMenuScreen implements Screen {
 		GAME = gam;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, GAME.WINDOWX, GAME.WINDOWY);
-
-	    Table table = new Table();
-	    table.setFillParent(true);
+		
 	}
 
 	@Override
@@ -28,7 +25,7 @@ public class MainMenuScreen implements Screen {
 		// TODO Auto-generated method stub
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        
         camera.update();
         GAME.batch.setProjectionMatrix(camera.combined);
 

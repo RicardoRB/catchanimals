@@ -19,7 +19,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class GameScreen implements Screen {
 	private final CatchAnimals GAME;
 	private static final int NANOMAXTIMEDROP = 1000000000;
-	
 	private static final int BUCKETVELX = 200;
 	private Texture dropImage;
 	private Texture bucketImage;
@@ -30,6 +29,7 @@ public class GameScreen implements Screen {
 	private Array<Rectangle> raindrops;
 	private long lastDropTime;
 	private int dropsGathered;
+	private boolean touched;
 
 	public GameScreen(final CatchAnimals game) {
 		// TODO Auto-generated constructor stub
@@ -53,11 +53,11 @@ public class GameScreen implements Screen {
 
 		// create a Rectangle to logically represent the bucket
 		bucket = new Rectangle();
-		bucket.x = GAME.WINDOWX / 2 - 64 / 2; // center the bucket horizontally
+		bucket.x = GAME.WINDOWX / 2 - bucket.getWidth() / 2; // center the bucket horizontally
 		bucket.y = 20; // bottom left corner of the bucket is 20 pixels above
 						// the bottom screen edge
-		bucket.width = 64;
-		bucket.height = 64;
+		bucket.width = bucketImage.getWidth();
+		bucket.height = bucketImage.getHeight();
 
 		// create the raindrops array and spawn the first raindrop
 		raindrops = new Array<Rectangle>();
@@ -66,10 +66,10 @@ public class GameScreen implements Screen {
 
 	private void spawnRaindrop() {
 		Rectangle raindrop = new Rectangle();
-		raindrop.x = MathUtils.random(0, GAME.WINDOWX - 64);
+		raindrop.x = MathUtils.random(0, GAME.WINDOWX - dropImage.getWidth());
 		raindrop.y = GAME.WINDOWY;
-		raindrop.width = 64;
-		raindrop.height = 64;
+		raindrop.width = dropImage.getWidth();
+		raindrop.height = dropImage.getHeight();
 		raindrops.add(raindrop);
 		lastDropTime = TimeUtils.nanoTime();
 	}
@@ -100,13 +100,26 @@ public class GameScreen implements Screen {
 		}
 		GAME.batch.end();
 
+		//convert input position in camera positio
+		Vector3 touchPos = new Vector3();
+		touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+		camera.unproject(touchPos);
+		
 		// process user input
-		if (Gdx.input.isTouched()) {
-			Vector3 touchPos = new Vector3();
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touchPos);
-			bucket.x = touchPos.x - 64 / 2;
+		//was touched the bucket?
+		if (Gdx.input.isTouched() && (touchPos.x > bucket.x && touchPos.x < bucket.x + bucket.width)
+				&& (touchPos.y > bucket.y && touchPos.y < bucket.y + bucket.height)) {
+			touched = true;
 		}
+		
+		if(!Gdx.input.isTouched()){
+			touched = false;
+		}
+		
+		if(touched){
+			bucket.x = touchPos.x - bucketImage.getWidth() / 2;
+		}
+		
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
 			bucket.x -= BUCKETVELX * Gdx.graphics.getDeltaTime();
 		}
@@ -118,8 +131,8 @@ public class GameScreen implements Screen {
 		if (bucket.x < 0) {
 			bucket.x = 0;
 		}
-		if (bucket.x > GAME.WINDOWX - 64) {
-			bucket.x = GAME.WINDOWX - 64;
+		if (bucket.x > GAME.WINDOWX - bucketImage.getWidth()) {
+			bucket.x = GAME.WINDOWX - bucketImage.getWidth();
 		}
 
 		// check if we need to create a new raindrop
@@ -134,7 +147,7 @@ public class GameScreen implements Screen {
 		while (iter.hasNext()) {
 			Rectangle raindrop = iter.next();
 			raindrop.y -= BUCKETVELX * Gdx.graphics.getDeltaTime();
-			if (raindrop.y + 64 < 0){
+			if (raindrop.y + dropImage.getHeight() < 0){
 				iter.remove();
 			}
 			if (raindrop.overlaps(bucket)) {
