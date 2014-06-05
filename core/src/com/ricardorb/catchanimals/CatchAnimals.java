@@ -3,6 +3,7 @@ package com.ricardorb.catchanimals;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.ricardorb.screens.MainMenuScreen;
 
 public class CatchAnimals extends Game {
 
