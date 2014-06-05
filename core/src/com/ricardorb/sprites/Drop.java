@@ -1,21 +1,22 @@
 package com.ricardorb.sprites;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
+import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 
+/**
+ * Every drop in the game that the user should catch
+ * 
+ * @author RicardoRB
+ *
+ */
 public class Drop extends Element {
 	
 	private static final int DROPVELX = 300;
 	
-	
-	public Drop() {
-		super(new Texture(Gdx.files.internal("droplet.png")));
-	}
-	
 	public Drop(CatchAnimals game){
-		super(new Texture(Gdx.files.internal("droplet.png")), game);
+		super(Assets.droplet, game);
 		setX(MathUtils.random(0, game.WINDOWX - getWidth()));
 		setY(game.WINDOWY);
 	}

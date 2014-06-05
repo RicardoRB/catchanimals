@@ -1,5 +1,11 @@
 package com.ricardorb.controllers;
 
+/**
+ * I can abstract the controls with this class
+ * 
+ * @author RicardoRB
+ *
+ */
 public class ControllerBucket {
 	
 	private boolean moveL;

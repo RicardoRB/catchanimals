@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 import com.ricardorb.controllers.ControllerBucket;
 import com.ricardorb.inputs.InputBucket;
@@ -32,6 +33,7 @@ public class GameScreen implements Screen {
 
 	public GameScreen(CatchAnimals game) {
 		GAME = game;
+		Assets.load();
 		conBucket = new ControllerBucket();
 		inpBucket = new InputBucket(conBucket, GAME);
 		bucket = new Bucket(GAME, conBucket);
@@ -108,6 +110,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void show() {
 		Gdx.input.setInputProcessor(inpBucket);
+		rainMusic.play();
 	}
 
 	@Override
@@ -131,8 +134,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void dispose() {
 		rainMusic.dispose();
-		bucket.dispose();
-
+		Assets.dispose();
 	}
 
 	private void spawnRaindrop() {

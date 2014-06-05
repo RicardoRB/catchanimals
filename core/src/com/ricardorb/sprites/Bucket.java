@@ -1,10 +1,15 @@
 package com.ricardorb.sprites;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
+import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 import com.ricardorb.controllers.ControllerBucket;
-
+/**
+ * Bucket of the game, the user will move the bucket in the game
+ * 
+ * @author RicardoRB
+ *
+ */
 public class Bucket extends com.ricardorb.sprites.Element{
 	
 	private static final int BUCKETVELX = 200;
@@ -12,7 +17,7 @@ public class Bucket extends com.ricardorb.sprites.Element{
 	
 	
 	public Bucket(final CatchAnimals game, ControllerBucket conBucket) {
-		super(new Texture(Gdx.files.internal("bucket.png")),game);
+		super(Assets.bucket,game);
 		setPosition(game.WINDOWX / 2 - getWidth() / 2, 20);
 		setCenter(getWidth() / 2, getHeight() / 2);
 		this.conBucket = conBucket;
@@ -20,6 +25,7 @@ public class Bucket extends com.ricardorb.sprites.Element{
 	
 	public void update(){
 		
+		//Move the bucket
 		if(conBucket.isMoveR()){
 			setX(getX() + BUCKETVELX * Gdx.graphics.getDeltaTime());
 		}else if(conBucket.isMoveL()){
@@ -28,6 +34,7 @@ public class Bucket extends com.ricardorb.sprites.Element{
 			setPosition(conBucket.getDragX(), getY());
 		}
 		
+		//Bucket cant get out of the screen
 		if (getX() < 0) {
 			setX(0);
 		}
