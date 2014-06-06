@@ -3,11 +3,18 @@ package com.ricardorb.screens;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.ricardorb.catchanimals.Assets;
@@ -30,17 +37,46 @@ public class GameScreen implements Screen {
 	private long lastDropTime;
 	private int dropsGathered;
 	private Sound dropSound;
+	private Stage stage;
+	private TextButton btnX;
+	private Table buttonsTable;
+	private InputMultiplexer inputMulti;
+	private Label labDropsColeccted;
 
 	public GameScreen(CatchAnimals game) {
 		GAME = game;
-		Assets.load();
 		conBucket = new ControllerBucket();
 		inpBucket = new InputBucket(conBucket, GAME);
 		bucket = new Bucket(GAME, conBucket);
 		camera = new OrthographicCamera();
 		raindrops = new Array<Drop>();
+		stage = new Stage();
+		btnX = new TextButton("X", Assets.skin);
+		buttonsTable = new Table(Assets.skin);
+		inputMulti = new InputMultiplexer();
+		labDropsColeccted = new Label("Drops Collected: ", Assets.skin);
+		
+		buttonsTable.setFillParent(true);
+		buttonsTable.add(labDropsColeccted);
+		buttonsTable.add(btnX);
+		buttonsTable.top();
+		stage.addActor(buttonsTable);
+		
+		btnX.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				GAME.setScreen(new MainMenuScreen(GAME));
+			}
+		});
+		
+		//Adding every input in multiplexer
+		inputMulti.addProcessor(stage);
+		inputMulti.addProcessor(inpBucket);
+		
+		Gdx.input.setInputProcessor(inputMulti);
 
 		camera.setToOrtho(false, GAME.WINDOWX, GAME.WINDOWY);
+		
 		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
 		rainMusic.setLooping(true);
@@ -67,13 +103,16 @@ public class GameScreen implements Screen {
 		// begin a new batch and draw the bucket and
 		// all drops
 		GAME.batch.begin();
-		GAME.font.draw(GAME.batch, "Drops Collected: " + dropsGathered, 0,
-				GAME.WINDOWY);
 		bucket.draw(GAME.batch);
 		for (Drop raindrop : raindrops) {
 			raindrop.draw(GAME.batch);
 		}
 		GAME.batch.end();
+		
+		labDropsColeccted.setText("Drops Collected: " + dropsGathered);
+		
+		stage.act(Math.min(delta, 1 / 30f));
+		stage.draw();
 
 		// check if we need to create a new raindrop
 		if (TimeUtils.nanoTime() - lastDropTime > NANOMAXTIMEDROP) {
@@ -98,43 +137,37 @@ public class GameScreen implements Screen {
 				iter.remove();
 			}
 		}
-
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
+		stage.getViewport().update(width, height, true);
 	}
 
 	@Override
 	public void show() {
-		Gdx.input.setInputProcessor(inpBucket);
 		rainMusic.play();
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-
+		rainMusic.pause();
 	}
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
-
+		rainMusic.stop();
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
+		rainMusic.play();
 
 	}
 
 	@Override
 	public void dispose() {
 		rainMusic.dispose();
-		Assets.dispose();
 	}
 
 	private void spawnRaindrop() {

@@ -13,6 +13,7 @@ public class CatchAnimals extends Game {
 	public final int WINDOWX = 800;
 
 	public void create() {
+		Assets.load();
 		batch = new SpriteBatch();
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont();
@@ -27,6 +28,7 @@ public class CatchAnimals extends Game {
 	public void dispose() {
 		batch.dispose();
 		font.dispose();
+		Assets.dispose();
 	}
 
 }
