@@ -8,15 +8,16 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 import com.ricardorb.controllers.ControllerBucket;
@@ -25,11 +26,20 @@ import com.ricardorb.sprites.Bucket;
 import com.ricardorb.sprites.Drop;
 
 public class GameScreen implements Screen {
-
+	
+	//Game states used in render
+	public enum State{
+		RUN,
+		PAUSE,
+		RESUME,
+		STOPPED,
+		GAMEOVER,
+		QUIT
+	}
+	
 	private static final long NANOMAXTIMEDROP = 1000000000;
 	private Bucket bucket;
 	private CatchAnimals GAME;
-	private OrthographicCamera camera;
 	private InputBucket inpBucket;
 	private ControllerBucket conBucket;
 	private Music rainMusic;
@@ -39,33 +49,44 @@ public class GameScreen implements Screen {
 	private Sound dropSound;
 	private Stage stage;
 	private TextButton btnX;
-	private Table buttonsTable;
+	private Table leftTable;
+	private Table rightTable;
 	private InputMultiplexer inputMulti;
 	private Label labDropsColeccted;
+	private State gameState;
+	private boolean showDialog;
+	
 
 	public GameScreen(CatchAnimals game) {
 		GAME = game;
 		conBucket = new ControllerBucket();
 		inpBucket = new InputBucket(conBucket, GAME);
 		bucket = new Bucket(GAME, conBucket);
-		camera = new OrthographicCamera();
 		raindrops = new Array<Drop>();
-		stage = new Stage();
+		stage = new Stage(new StretchViewport(GAME.WINDOWX,GAME.WINDOWY));
 		btnX = new TextButton("X", Assets.skin);
-		buttonsTable = new Table(Assets.skin);
+		leftTable = new Table(Assets.skin);
+		rightTable = new Table(Assets.skin);
 		inputMulti = new InputMultiplexer();
 		labDropsColeccted = new Label("Drops Collected: ", Assets.skin);
+		//With this boolean it wont draw more than 1 dialog
+		showDialog = false;
+		gameState = State.RUN;
 		
-		buttonsTable.setFillParent(true);
-		buttonsTable.add(labDropsColeccted);
-		buttonsTable.add(btnX);
-		buttonsTable.top();
-		stage.addActor(buttonsTable);
+		leftTable.setFillParent(true);
+		rightTable.setFillParent(true);
+		leftTable.top().left();
+		leftTable.add(labDropsColeccted);
+		rightTable.add(btnX).size(50f, 50f);
+		rightTable.top().right();
+		
+		stage.addActor(leftTable);
+		stage.addActor(rightTable);
 		
 		btnX.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				GAME.setScreen(new MainMenuScreen(GAME));
+				gameState = State.STOPPED;
 			}
 		});
 		
@@ -74,8 +95,6 @@ public class GameScreen implements Screen {
 		inputMulti.addProcessor(inpBucket);
 		
 		Gdx.input.setInputProcessor(inputMulti);
-
-		camera.setToOrtho(false, GAME.WINDOWX, GAME.WINDOWY);
 		
 		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
@@ -86,20 +105,15 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-
 		// clear the screen with a dark blue color. The
 		// arguments to glClearColor are the red, green
 		// blue and alpha component in the range [0,1]
 		// of the color to be used to clear the screen.
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
 		// tell the camera to update its matrices.
-		camera.update();
-		bucket.update();
-
-		GAME.batch.setProjectionMatrix(camera.combined);
-
+		
+		GAME.batch.setProjectionMatrix(stage.getCamera().combined);
 		// begin a new batch and draw the bucket and
 		// all drops
 		GAME.batch.begin();
@@ -108,35 +122,89 @@ public class GameScreen implements Screen {
 			raindrop.draw(GAME.batch);
 		}
 		GAME.batch.end();
-		
-		labDropsColeccted.setText("Drops Collected: " + dropsGathered);
-		
+
 		stage.act(Math.min(delta, 1 / 30f));
 		stage.draw();
 
-		// check if we need to create a new raindrop
-		if (TimeUtils.nanoTime() - lastDropTime > NANOMAXTIMEDROP) {
-			spawnRaindrop();
-		}
+		switch (gameState) {
+		case RUN:
+			Table.drawDebug(stage);
 
-		// move the raindrops, remove any that are beneath the bottom edge of
-		// the screen or that hit the bucket. In the later case we play back
-		// a sound effect as well.
-		Iterator<Drop> iter = raindrops.iterator();
-		while (iter.hasNext()) {
-			Drop raindrop = iter.next();
-			raindrop.update();
-			if (raindrop.getY() + raindrop.getHeight() < 0) {
-				iter.remove();
+			bucket.update();
+
+			labDropsColeccted.setText("Drops Collected: " + dropsGathered);
+
+			// check if we need to create a new raindrop
+			if (TimeUtils.nanoTime() - lastDropTime > NANOMAXTIMEDROP) {
+				spawnRaindrop();
 			}
 
-			if (raindrop.getRectangle().overlaps(bucket.getRectangle())) {
-				dropsGathered++;
-				Gdx.input.vibrate(100);
-				dropSound.play();
-				iter.remove();
+			// move the raindrops, remove any that are beneath the bottom edge
+			// of
+			// the screen or that hit the bucket. In the later case we play back
+			// a sound effect as well.
+			Iterator<Drop> iter = raindrops.iterator();
+			while (iter.hasNext()) {
+				Drop raindrop = iter.next();
+				raindrop.update();
+				if (raindrop.getY() + raindrop.getHeight() < 0) {
+					iter.remove();
+				}
+
+				if (raindrop.getRectangle().overlaps(bucket.getRectangle())) {
+					dropsGathered++;
+					Gdx.input.vibrate(100);
+					dropSound.play();
+					iter.remove();
+				}
 			}
+			break;
+
+		case PAUSE:
+			if(!showDialog){
+				showDialog = true;
+				new Dialog("Pause", Assets.skin, "dialog") {
+					protected void result(Object object) {
+						boolean confirmation = (Boolean) object;
+						if (confirmation) {
+							gameState = State.RESUME;
+							showDialog = false;
+						}
+					}
+				}.text("Resume game?").button("Resume", true).show(stage);
+			}
+			break;
+
+		case RESUME:
+			gameState = State.RUN;
+			break;
+
+		case STOPPED:
+			if(!showDialog){
+				showDialog = true;
+				new Dialog("Pause", Assets.skin, "dialog") {
+					protected void result(Object object) {
+
+						boolean confirmation = (Boolean) object;
+						showDialog = false;
+						gameState = confirmation ? State.QUIT : State.RESUME;
+					}
+				}.text("Are you sure you want to quit?").button("Yes", true).button("No", false).show(stage);
+			}
+			break;
+
+		case GAMEOVER:
+			
+			break;
+		case QUIT:
+			GAME.setScreen(new MainMenuScreen(GAME));
+			break;
+
+		default:
+			break;
 		}
+
+		
 	}
 
 	@Override
@@ -152,17 +220,18 @@ public class GameScreen implements Screen {
 	@Override
 	public void hide() {
 		rainMusic.pause();
+		gameState = State.PAUSE;
 	}
 
 	@Override
 	public void pause() {
 		rainMusic.stop();
+		gameState = State.PAUSE;
 	}
 
 	@Override
 	public void resume() {
 		rainMusic.play();
-
 	}
 
 	@Override
