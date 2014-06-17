@@ -8,6 +8,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -17,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 import com.ricardorb.controllers.ControllerBucket;
@@ -55,6 +55,7 @@ public class GameScreen implements Screen {
 	private Label labDropsColeccted;
 	private State gameState;
 	private boolean showDialog;
+	OrthographicCamera camera;
 	
 
 	public GameScreen(CatchAnimals game) {
@@ -63,12 +64,14 @@ public class GameScreen implements Screen {
 		inpBucket = new InputBucket(conBucket, GAME);
 		bucket = new Bucket(GAME, conBucket);
 		raindrops = new Array<Drop>();
-		stage = new Stage(new StretchViewport(GAME.WINDOWX,GAME.WINDOWY));
+		stage = new Stage();
 		btnX = new TextButton("X", Assets.skin);
 		leftTable = new Table(Assets.skin);
 		rightTable = new Table(Assets.skin);
 		inputMulti = new InputMultiplexer();
 		labDropsColeccted = new Label("Drops Collected: ", Assets.skin);
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false,GAME.WINDOWX, GAME.WINDOWY);
 		//With this boolean it wont draw more than 1 dialog
 		showDialog = false;
 		gameState = State.RUN;
@@ -77,7 +80,7 @@ public class GameScreen implements Screen {
 		rightTable.setFillParent(true);
 		leftTable.top().left();
 		leftTable.add(labDropsColeccted);
-		rightTable.add(btnX).size(50f, 50f);
+		rightTable.add(btnX).size(40f, 40f);
 		rightTable.top().right();
 		
 		stage.addActor(leftTable);
@@ -112,8 +115,8 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		// tell the camera to update its matrices.
-		
-		GAME.batch.setProjectionMatrix(stage.getCamera().combined);
+		camera.update();
+		GAME.batch.setProjectionMatrix(camera.combined);
 		// begin a new batch and draw the bucket and
 		// all drops
 		GAME.batch.begin();

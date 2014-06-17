@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 
@@ -24,22 +23,20 @@ public class MainMenuScreen implements Screen {
 	public MainMenuScreen(final CatchAnimals gam) {
 		//Initialize objects
 		GAME = gam;
-		stage = new Stage(new FillViewport(GAME.WINDOWX,GAME.WINDOWY));
+		stage = new Stage();
 		btnStartGame = new TextButton("Start Game", Assets.skin);
 		btnOptions = new TextButton("Options", Assets.skin);
 		btnExit = new TextButton("Exit", Assets.skin);
 		buttonsTable = new Table(Assets.skin);
 		
-		final float btnWidth = GAME.WINDOWX / 2;
-		final float btnHeight = GAME.WINDOWY / 6;
 		//Buttons structure
 		buttonsTable.setFillParent(true);
 		buttonsTable.center();
-		buttonsTable.add(btnStartGame).size(btnWidth, btnHeight);
+		buttonsTable.add(btnStartGame).size(100f, 50f);
 		buttonsTable.row();
-		buttonsTable.add(btnOptions).space(10f).size(btnWidth, btnHeight);
+		buttonsTable.add(btnOptions).space(10f).size(100f, 50f);
 		buttonsTable.row();
-		buttonsTable.add(btnExit).size(btnWidth, btnHeight);
+		buttonsTable.add(btnExit).size(100f, 50f);
 		stage.addActor(buttonsTable);
 
 		
@@ -64,11 +61,16 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void render(final float delta) {
-		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		//135R 206G 235B
+		//135/255 = 0.529
+		//206/255 = 0.807
+		//235/255 = 0.921
+		Gdx.gl.glClearColor(0.529f, 0.807f, 0.921f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+		
 		stage.act(Math.min(delta, 1 / 30f));
 		stage.draw();
+		
 	}
 
 	@Override
