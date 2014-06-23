@@ -13,7 +13,6 @@ public class CatchAnimals extends Game {
 	public void create() {
 		Assets.load();
 		batch = new SpriteBatch();
-		// Use LibGDX's default Arial font.
 		this.setScreen(new MainMenuScreen(this));
 	}
 

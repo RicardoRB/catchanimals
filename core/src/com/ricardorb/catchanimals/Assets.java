@@ -7,15 +7,41 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class Assets {
 	public static TextureAtlas atlas;
-	public static TextureRegion bucket;
-	public static TextureRegion droplet;
+	public static TextureRegion basket;
+	public static TextureRegion cow, bear, cat, elephant, elk, frog;
+	public static TextureRegion gnu, hand, kangaroo, landscape, leopard, monkey;
+	public static TextureRegion owl, pig, sheep, squirrel;
 	public static Skin skin;
+	public static String effects;
+	public static String music;
+	public static String data;
+	public static String images;
 
 	public static void load() {
-		atlas = new TextureAtlas(Gdx.files.internal("imageAtlas.atlas"));
-		bucket = atlas.findRegion("bucket");
-		droplet = atlas.findRegion("droplet");
-		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
+		effects = "sounds/effects/";
+		music = "sounds/music/";
+		data = "data/";
+		images = "images/";
+		atlas = new TextureAtlas(Gdx.files.internal(images + "imageAtlas.atlas"));
+		basket = atlas.findRegion("basket");
+		cow = atlas.findRegion("cow");
+		bear = atlas.findRegion("bear");
+		cat = atlas.findRegion("cat");
+		elephant = atlas.findRegion("elephant");
+		elk = atlas.findRegion("elk");
+		frog = atlas.findRegion("frog");
+		gnu = atlas.findRegion("gnu");
+		hand = atlas.findRegion("hand");
+		kangaroo = atlas.findRegion("kangaroo");
+		landscape = atlas.findRegion("landscape");
+		leopard = atlas.findRegion("leopard");
+		monkey = atlas.findRegion("monkey");
+		owl = atlas.findRegion("owl");
+		pig = atlas.findRegion("pig");
+		sheep = atlas.findRegion("sheep");
+		squirrel = atlas.findRegion("squirrel");
+		skin = new Skin(Gdx.files.internal(data + "uiskin.json"));
+		
 	}
 
 	public static void dispose() {

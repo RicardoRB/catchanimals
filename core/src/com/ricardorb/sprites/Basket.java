@@ -10,14 +10,14 @@ import com.ricardorb.controllers.ControllerBucket;
  * @author RicardoRB
  *
  */
-public class Bucket extends com.ricardorb.sprites.Element{
+public class Basket extends com.ricardorb.sprites.Element{
 	
 	private static final int BUCKETVELX = 200;
 	private ControllerBucket conBucket;
 	
 	
-	public Bucket(final CatchAnimals game, ControllerBucket conBucket) {
-		super(Assets.bucket,game);
+	public Basket(final CatchAnimals game, ControllerBucket conBucket) {
+		super(Assets.basket,game);
 		setPosition(game.WINDOWX / 2 - getWidth() / 2, 20);
 		setCenter(getWidth() / 2, getHeight() / 2);
 		this.conBucket = conBucket;

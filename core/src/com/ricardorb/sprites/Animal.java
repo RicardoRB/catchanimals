@@ -11,12 +11,12 @@ import com.ricardorb.catchanimals.CatchAnimals;
  * @author RicardoRB
  *
  */
-public class Drop extends Element {
+public class Animal extends Element {
 	
 	private static final int DROPVELX = 300;
 	
-	public Drop(CatchAnimals game){
-		super(Assets.droplet, game);
+	public Animal(CatchAnimals game){
+		super(Assets.cow, game);
 		setX(MathUtils.random(0, game.WINDOWX - getWidth()));
 		setY(game.WINDOWY);
 	}

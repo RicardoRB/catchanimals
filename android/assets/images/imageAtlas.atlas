@@ -1,0 +1,153 @@
+
+imageAtlas.png
+size: 998,876
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+arrow
+  rotate: false
+  xy: 2, 266
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+basket
+  rotate: false
+  xy: 132, 294
+  size: 90, 34
+  orig: 90, 34
+  offset: 0, 0
+  index: -1
+bear
+  rotate: false
+  xy: 68, 200
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
+cat
+  rotate: false
+  xy: 804, 616
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
+cow
+  rotate: false
+  xy: 2, 200
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+dog
+  rotate: false
+  xy: 870, 682
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
+elephant
+  rotate: false
+  xy: 132, 330
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+elk
+  rotate: false
+  xy: 804, 682
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+frog
+  rotate: false
+  xy: 934, 812
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+gnu
+  rotate: false
+  xy: 2, 68
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
+hand
+  rotate: false
+  xy: 804, 748
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+hippopotamus
+  rotate: false
+  xy: 264, 330
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
+kangaroo
+  rotate: false
+  xy: 68, 134
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
+landscape
+  rotate: false
+  xy: 2, 396
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+leopard
+  rotate: false
+  xy: 52, 69
+  size: 48, 63
+  orig: 48, 63
+  offset: 0, 0
+  index: -1
+monkey
+  rotate: false
+  xy: 934, 762
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+owl
+  rotate: false
+  xy: 804, 550
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
+penguin
+  rotate: false
+  xy: 854, 616
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
+pig
+  rotate: false
+  xy: 2, 134
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+sheep
+  rotate: false
+  xy: 198, 330
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+squirrel
+  rotate: false
+  xy: 2, 2
+  size: 48, 64
+  orig: 48, 64
+  offset: 0, 0
+  index: -1
