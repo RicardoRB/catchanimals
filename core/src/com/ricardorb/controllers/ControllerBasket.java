@@ -6,7 +6,7 @@ package com.ricardorb.controllers;
  * @author RicardoRB
  *
  */
-public class ControllerBucket {
+public class ControllerBasket {
 	
 	private boolean moveL;
 	private boolean moveR;

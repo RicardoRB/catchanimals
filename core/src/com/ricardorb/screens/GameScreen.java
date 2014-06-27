@@ -18,11 +18,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
-import com.ricardorb.controllers.ControllerBucket;
-import com.ricardorb.inputs.InputBucket;
+import com.ricardorb.controllers.ControllerBasket;
+import com.ricardorb.inputs.InputBasket;
 import com.ricardorb.sprites.Animal;
 import com.ricardorb.sprites.Basket;
 
@@ -38,40 +37,50 @@ public class GameScreen implements Screen {
 		QUIT
 	}
 	
-	private static final long NANOMAXTIMEDROP = 1000000000;
+	private float animalsForSeconds;
 	private Basket basket;
 	private CatchAnimals GAME;
-	private InputBucket inpBucket;
-	private ControllerBucket conBucket;
+	private InputBasket inpBasket;
+	private ControllerBasket conBasket;
 	private Music rainMusic;
 	private Array<Animal> rainAnimals;
-	private long lastDropTime;
-	private int dropsGathered;
+	private float lastAnimalTime;
+	private int animalsGathered;
 	private Sound animalCatch;
 	private Stage stage;
 	private TextButton btnX;
 	private Table leftTable;
 	private Table rightTable;
+	private Table centerTable;
 	private InputMultiplexer inputMulti;
 	private Label labDropsColeccted;
+	private Label labTime;
 	private GameState gameState;
 	private boolean showDialog;
 	private OrthographicCamera camera;
 	private Sprite background;
+	private float timeCounter;
+	private static final int MAXANIMALSLOST = 5;
+	private int countAnimalLost;
 	
 
 	public GameScreen(CatchAnimals game) {
 		GAME = game;
-		conBucket = new ControllerBucket();
-		inpBucket = new InputBucket(conBucket, GAME);
-		basket = new Basket(GAME, conBucket);
+		animalsForSeconds = 1;
+		countAnimalLost = 0;
+		lastAnimalTime = 0;
+		conBasket = new ControllerBasket();
+		inpBasket = new InputBasket(conBasket, GAME);
+		basket = new Basket(GAME, conBasket);
 		rainAnimals = new Array<Animal>();
 		stage = new Stage();
 		btnX = new TextButton("X", Assets.skin);
 		leftTable = new Table(Assets.skin);
 		rightTable = new Table(Assets.skin);
+		centerTable = new Table(Assets.skin);
 		inputMulti = new InputMultiplexer();
 		labDropsColeccted = new Label("Score: ", Assets.skin);
+		labTime = new Label("Time: ", Assets.skin);
 		camera = new OrthographicCamera();
 		background = new Sprite(Assets.landscape);
 		animalCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
@@ -84,13 +93,17 @@ public class GameScreen implements Screen {
 		gameState = GameState.RUN;
 		leftTable.setFillParent(true);
 		rightTable.setFillParent(true);
+		centerTable.setFillParent(true);
 		leftTable.top().left();
 		leftTable.add(labDropsColeccted);
 		rightTable.add(btnX).size(40f, 40f);
 		rightTable.top().right();
+		centerTable.add(labTime);
+		centerTable.top();
 		
 		stage.addActor(leftTable);
 		stage.addActor(rightTable);
+		stage.addActor(centerTable);
 		
 		btnX.addListener(new ClickListener(){
 			@Override
@@ -101,15 +114,16 @@ public class GameScreen implements Screen {
 		
 		//Adding every input in multiplexer
 		inputMulti.addProcessor(stage);
-		inputMulti.addProcessor(inpBucket);
+		inputMulti.addProcessor(inpBasket);
 		
 		Gdx.input.setInputProcessor(inputMulti);
 		
-		spawnRaindrop();
+		spawnAnimal();
 	}
 
 	@Override
 	public void render(float delta) {
+		
 		// clear the screen with a dark blue color. The
 		// arguments to glClearColor are the red, green
 		// blue and alpha component in the range [0,1]
@@ -131,18 +145,22 @@ public class GameScreen implements Screen {
 
 		stage.act(Math.min(delta, 1 / 30f));
 		stage.draw();
-
+		
 		switch (gameState) {
 		case RUN:
-			Table.drawDebug(stage);
-
+			
+			if(countAnimalLost >= MAXANIMALSLOST){
+				gameState = GameState.GAMEOVER;
+			}
+			
+			timeCounter += delta;
+			
 			basket.update();
-
-			labDropsColeccted.setText("Score: " + dropsGathered);
-
-			// check if we need to create a new raindrop
-			if (TimeUtils.nanoTime() - lastDropTime > NANOMAXTIMEDROP) {
-				spawnRaindrop();
+			labDropsColeccted.setText("Score: " + animalsGathered);
+			labTime.setText("Time: " + (int)timeCounter);
+			// check if we need to create a new rainanimal
+			if (timeCounter - lastAnimalTime >  animalsForSeconds / (timeCounter * 0.0325f)) {
+				spawnAnimal();
 			}
 
 			// move the raindrops, remove any that are beneath the bottom edge
@@ -151,14 +169,15 @@ public class GameScreen implements Screen {
 			// a sound effect as well.
 			Iterator<Animal> iter = rainAnimals.iterator();
 			while (iter.hasNext()) {
-				Animal raindrop = iter.next();
-				raindrop.update();
-				if (raindrop.getY() + raindrop.getHeight() < 0) {
+				Animal animal = iter.next();
+				animal.update();
+				if (animal.getY() + animal.getHeight() < 0) {
 					iter.remove();
+					countAnimalLost++;
 				}
 
-				if (raindrop.getRectangle().overlaps(basket.getRectangle())) {
-					dropsGathered++;
+				if (animal.getRectangle().overlaps(basket.getRectangle())) {
+					animalsGathered++;
 					Gdx.input.vibrate(100);
 					animalCatch.play();
 					iter.remove();
@@ -200,7 +219,21 @@ public class GameScreen implements Screen {
 			break;
 
 		case GAMEOVER:
-			
+			if(!showDialog){
+				showDialog = true;
+				new Dialog("Game Over", Assets.skin, "dialog") {
+					protected void result(Object object) {
+
+						boolean confirmation = (Boolean) object;
+						showDialog = false;
+						if(confirmation){
+							resetGame();
+						} else {
+							GAME.setScreen(new MainMenuScreen(GAME));
+						}
+					}
+				}.text("Your score " + animalsGathered + ". Retry?").button("Yes", true).button("Go to menu", false).show(stage);
+			}
 			break;
 		case QUIT:
 			GAME.setScreen(new MainMenuScreen(GAME));
@@ -245,10 +278,24 @@ public class GameScreen implements Screen {
 		rainMusic.dispose();
 	}
 
-	private void spawnRaindrop() {
+	private void spawnAnimal() {
 		Animal raindrop = new Animal(GAME);
 		rainAnimals.add(raindrop);
-		lastDropTime = TimeUtils.nanoTime();
+		lastAnimalTime = timeCounter;
+	}
+	
+	private void resetGame() {
+		countAnimalLost = 0;
+		timeCounter = 0;
+		animalsGathered = 0;
+		lastAnimalTime = 0;
+		Iterator<Animal> iter = rainAnimals.iterator();
+		while (iter.hasNext()) {
+			iter.next();
+			iter.remove();
+		}
+		spawnAnimal();
+		gameState = GameState.RUN;
 	}
 
 }

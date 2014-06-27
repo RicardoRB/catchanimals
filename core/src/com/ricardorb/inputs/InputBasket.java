@@ -5,14 +5,14 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.ricardorb.catchanimals.CatchAnimals;
-import com.ricardorb.controllers.ControllerBucket;
+import com.ricardorb.controllers.ControllerBasket;
 
-public class InputBucket extends InputAdapter {
+public class InputBasket extends InputAdapter {
 	
-	private ControllerBucket conBucket;
+	private ControllerBasket conBucket;
 	private final CatchAnimals GAME;
 	
-	public InputBucket(ControllerBucket conBucket, CatchAnimals game){
+	public InputBasket(ControllerBasket conBucket, CatchAnimals game){
 		this.conBucket = conBucket;
 		this.GAME = game;
 	}
