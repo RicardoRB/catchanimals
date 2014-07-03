@@ -39,7 +39,7 @@ public class GameScreen implements Screen {
 	
 	private float animalsForSeconds;
 	private Basket basket;
-	private CatchAnimals GAME;
+	private CatchAnimals mainGame;
 	private InputBasket inpBasket;
 	private ControllerBasket conBasket;
 	private Music rainMusic;
@@ -62,16 +62,18 @@ public class GameScreen implements Screen {
 	private float timeCounter;
 	private static final int MAXANIMALSLOST = 5;
 	private int countAnimalLost;
+	private int animalNum;
 	
 
 	public GameScreen(CatchAnimals game) {
-		GAME = game;
+		mainGame = game;
+		animalNum = 0;
 		animalsForSeconds = 1;
 		countAnimalLost = 0;
 		lastAnimalTime = 0;
 		conBasket = new ControllerBasket();
-		inpBasket = new InputBasket(conBasket, GAME);
-		basket = new Basket(GAME, conBasket);
+		inpBasket = new InputBasket(conBasket, mainGame);
+		basket = new Basket(mainGame, conBasket);
 		rainAnimals = new Array<Animal>();
 		stage = new Stage();
 		btnX = new TextButton("X", Assets.skin);
@@ -87,7 +89,65 @@ public class GameScreen implements Screen {
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal(Assets.music + "rain.mp3"));
 		
 		rainMusic.setLooping(true);
-		camera.setToOrtho(false,GAME.WINDOWX, GAME.WINDOWY);
+		camera.setToOrtho(false,mainGame.WINDOWX, mainGame.WINDOWY);
+		//With this boolean it wont draw more than 1 dialog
+		showDialog = false;
+		gameState = GameState.RUN;
+		leftTable.setFillParent(true);
+		rightTable.setFillParent(true);
+		centerTable.setFillParent(true);
+		leftTable.top().left();
+		leftTable.add(labDropsColeccted);
+		rightTable.add(btnX).size(40f, 40f);
+		rightTable.top().right();
+		centerTable.add(labTime);
+		centerTable.top();
+		
+		stage.addActor(leftTable);
+		stage.addActor(rightTable);
+		stage.addActor(centerTable);
+		
+		btnX.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				gameState = GameState.STOPPED;
+			}
+		});
+		
+		//Adding every input in multiplexer
+		inputMulti.addProcessor(stage);
+		inputMulti.addProcessor(inpBasket);
+		
+		Gdx.input.setInputProcessor(inputMulti);
+		
+		spawnAnimal();
+	}
+
+	public GameScreen(CatchAnimals game, int animalCount) {
+		mainGame = game;
+		animalsForSeconds = 1;
+		animalNum = animalCount;
+		countAnimalLost = 0;
+		lastAnimalTime = 0;
+		conBasket = new ControllerBasket();
+		inpBasket = new InputBasket(conBasket, mainGame);
+		basket = new Basket(mainGame, conBasket);
+		rainAnimals = new Array<Animal>();
+		stage = new Stage();
+		btnX = new TextButton("X", Assets.skin);
+		leftTable = new Table(Assets.skin);
+		rightTable = new Table(Assets.skin);
+		centerTable = new Table(Assets.skin);
+		inputMulti = new InputMultiplexer();
+		labDropsColeccted = new Label("Score: ", Assets.skin);
+		labTime = new Label("Time: ", Assets.skin);
+		camera = new OrthographicCamera();
+		background = new Sprite(Assets.landscape);
+		animalCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
+		rainMusic = Gdx.audio.newMusic(Gdx.files.internal(Assets.music + "rain.mp3"));
+		
+		rainMusic.setLooping(true);
+		camera.setToOrtho(false, mainGame.WINDOWX, mainGame.WINDOWY);
 		//With this boolean it wont draw more than 1 dialog
 		showDialog = false;
 		gameState = GameState.RUN;
@@ -132,57 +192,23 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		// tell the camera to update its matrices.
 		camera.update();
-		GAME.batch.setProjectionMatrix(camera.combined);
+		mainGame.batch.setProjectionMatrix(camera.combined);
 		// begin a new batch and draw the bucket and
 		// all drops
-		GAME.batch.begin();
-		background.draw(GAME.batch);
-		basket.draw(GAME.batch);
+		mainGame.batch.begin();
+		background.draw(mainGame.batch);
+		basket.draw(mainGame.batch);
 		for (Animal raindrop : rainAnimals) {
-			raindrop.draw(GAME.batch);
+			raindrop.draw(mainGame.batch);
 		}
-		GAME.batch.end();
+		mainGame.batch.end();
 
 		stage.act(Math.min(delta, 1 / 30f));
 		stage.draw();
 		
 		switch (gameState) {
 		case RUN:
-			
-			if(countAnimalLost >= MAXANIMALSLOST){
-				gameState = GameState.GAMEOVER;
-			}
-			
-			timeCounter += delta;
-			
-			basket.update();
-			labDropsColeccted.setText("Score: " + animalsGathered);
-			labTime.setText("Time: " + (int)timeCounter);
-			// check if we need to create a new rainanimal
-			if (timeCounter - lastAnimalTime >  animalsForSeconds / (timeCounter * 0.0325f)) {
-				spawnAnimal();
-			}
-
-			// move the raindrops, remove any that are beneath the bottom edge
-			// of
-			// the screen or that hit the bucket. In the later case we play back
-			// a sound effect as well.
-			Iterator<Animal> iter = rainAnimals.iterator();
-			while (iter.hasNext()) {
-				Animal animal = iter.next();
-				animal.update();
-				if (animal.getY() + animal.getHeight() < 0) {
-					iter.remove();
-					countAnimalLost++;
-				}
-
-				if (animal.getRectangle().overlaps(basket.getRectangle())) {
-					animalsGathered++;
-					Gdx.input.vibrate(100);
-					animalCatch.play();
-					iter.remove();
-				}
-			}
+			runGame(delta);
 			break;
 
 		case PAUSE:
@@ -229,14 +255,15 @@ public class GameScreen implements Screen {
 						if(confirmation){
 							resetGame();
 						} else {
-							GAME.setScreen(new MainMenuScreen(GAME));
+							mainGame.setScreen(new MainMenuScreen(mainGame));
 						}
 					}
 				}.text("Your score " + animalsGathered + ". Retry?").button("Yes", true).button("Go to menu", false).show(stage);
 			}
 			break;
+			
 		case QUIT:
-			GAME.setScreen(new MainMenuScreen(GAME));
+			mainGame.setScreen(new MainMenuScreen(mainGame));
 			break;
 
 		default:
@@ -244,6 +271,43 @@ public class GameScreen implements Screen {
 		}
 
 		
+	}
+
+	private void runGame(float delta) {
+		if(countAnimalLost >= MAXANIMALSLOST){
+			gameState = GameState.GAMEOVER;
+		}
+		
+		timeCounter += delta;
+		
+		basket.update();
+		labDropsColeccted.setText("Score: " + animalsGathered);
+		labTime.setText("Time: " + (int)timeCounter);
+		// check if we need to create a new rainanimals
+		if (timeCounter - lastAnimalTime >  animalsForSeconds / (timeCounter * 0.0325f)) {
+			spawnAnimal();
+		}
+
+		// move the raindrops, remove any that are beneath the bottom edge
+		// of
+		// the screen or that hit the bucket. In the later case we play back
+		// a sound effect as well.
+		Iterator<Animal> iter = rainAnimals.iterator();
+		while (iter.hasNext()) {
+			Animal animal = iter.next();
+			animal.update();
+			if (animal.getY() + animal.getHeight() < 0) {
+				iter.remove();
+				countAnimalLost++;
+			}
+
+			if (animal.getRectangle().overlaps(basket.getRectangle())) {
+				animalsGathered++;
+				Gdx.input.vibrate(100);
+				animalCatch.play();
+				iter.remove();
+			}
+		}
 	}
 
 	@Override
@@ -279,8 +343,8 @@ public class GameScreen implements Screen {
 	}
 
 	private void spawnAnimal() {
-		Animal raindrop = new Animal(GAME);
-		rainAnimals.add(raindrop);
+		Animal rainAnimal = new Animal(mainGame, Assets.animalsList.get(animalNum));
+		rainAnimals.add(rainAnimal);
 		lastAnimalTime = timeCounter;
 	}
 	

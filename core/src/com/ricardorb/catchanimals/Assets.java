@@ -1,5 +1,7 @@
 package com.ricardorb.catchanimals;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,7 +12,8 @@ public class Assets {
 	public static TextureRegion basket;
 	public static TextureRegion cow, bear, cat, elephant, elk, frog;
 	public static TextureRegion gnu, hand, kangaroo, landscape, leopard, monkey;
-	public static TextureRegion owl, pig, sheep, squirrel;
+	public static TextureRegion owl, pig, sheep, squirrel, arrow;
+	public static ArrayList<TextureRegion> animalsList;
 	public static Skin skin;
 	public static String effects;
 	public static String music;
@@ -40,7 +43,24 @@ public class Assets {
 		pig = atlas.findRegion("pig");
 		sheep = atlas.findRegion("sheep");
 		squirrel = atlas.findRegion("squirrel");
+		arrow = atlas.findRegion("arrow");
 		skin = new Skin(Gdx.files.internal(data + "uiskin.json"));
+		
+		animalsList = new ArrayList<TextureRegion>();
+		animalsList.add(cow);
+		animalsList.add(bear);
+		animalsList.add(cat);
+		animalsList.add(elephant);
+		animalsList.add(elk);
+		animalsList.add(frog);
+		animalsList.add(gnu);
+		animalsList.add(kangaroo);
+		animalsList.add(leopard);
+		animalsList.add(monkey);
+		animalsList.add(owl);
+		animalsList.add(pig);
+		animalsList.add(sheep);
+		animalsList.add(squirrel);
 		
 	}
 

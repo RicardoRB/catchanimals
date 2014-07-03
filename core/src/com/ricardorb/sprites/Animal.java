@@ -1,8 +1,8 @@
 package com.ricardorb.sprites;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 
 /**
@@ -15,8 +15,8 @@ public class Animal extends Element {
 	
 	private static final int DROPVELX = 300;
 	
-	public Animal(CatchAnimals game){
-		super(Assets.cow, game);
+	public Animal(CatchAnimals game, TextureRegion textureRegion){
+		super(textureRegion, game);
 		setX(MathUtils.random(0, game.WINDOWX - getWidth()));
 		setY(game.WINDOWY);
 	}
