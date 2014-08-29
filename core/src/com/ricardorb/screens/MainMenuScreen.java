@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.esotericsoftware.tablelayout.Cell;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 
@@ -74,6 +73,7 @@ public class MainMenuScreen implements Screen {
 		});
 		
 		arrowLeft.addListener(new ClickListener(){
+			@SuppressWarnings("unchecked")
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				if(animalCount > 0){
@@ -82,11 +82,12 @@ public class MainMenuScreen implements Screen {
 					animalCount = animalsList.size() - 1;
 				}
 					Image auxAnimal = new Image(animalsList.get(animalCount));
-					buttonsTable.getCells().get(2).setWidget(auxAnimal);
+					buttonsTable.getCells().get(2).setActor(auxAnimal);
 			}
 		});
 		
 		arrowRight.addListener(new ClickListener(){
+			@SuppressWarnings("unchecked")
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				if(animalCount < animalsList.size() - 1){
@@ -95,7 +96,7 @@ public class MainMenuScreen implements Screen {
 					animalCount = 0;
 				}
 					Image auxAnimal = new Image(animalsList.get(animalCount));
-					buttonsTable.getCells().get(2).setWidget(auxAnimal);
+					buttonsTable.getCells().get(2).setActor(auxAnimal);
 				
 			}
 		});
