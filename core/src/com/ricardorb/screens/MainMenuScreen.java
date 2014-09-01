@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -26,6 +28,7 @@ public class MainMenuScreen implements Screen {
 	private Image arrowRight;
 	private ArrayList<TextureRegion> animalsList;
 	private int animalCount;
+	private Sound clickSound;
 
 	public MainMenuScreen(final CatchAnimals gam) {
 		//Initialize objects
@@ -55,6 +58,8 @@ public class MainMenuScreen implements Screen {
 		buttonsTable.add(btnExit).size(100f, 50f);
 		
 		stage.addActor(buttonsTable);
+		
+		clickSound = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "click.ogg"));
 
 		
 		//Buttons events
@@ -76,6 +81,9 @@ public class MainMenuScreen implements Screen {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				arrowLeft.addAction(Actions.sequence(Actions.moveBy(-10f, 0, 0.1f),
+						Actions.moveBy(8f, 0, 0.1f)));
+				clickSound.play();
 				if(animalCount > 0){
 					animalCount--;
 				} else {
@@ -90,6 +98,9 @@ public class MainMenuScreen implements Screen {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				arrowRight.addAction(Actions.sequence(Actions.moveBy(10f, 0, 0.1f),
+						Actions.moveBy(-8f, 0, 0.1f)));
+				clickSound.play();
 				if(animalCount < animalsList.size() - 1){
 					animalCount++;
 				} else {

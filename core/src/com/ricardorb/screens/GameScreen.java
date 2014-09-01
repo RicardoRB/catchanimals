@@ -45,8 +45,10 @@ public class GameScreen implements Screen {
 	private Music rainMusic;
 	private Array<Animal> rainAnimals;
 	private float lastAnimalTime;
+	private float lastBugTime;
 	private int animalsGathered;
 	private Sound animalCatch;
+	private Sound bugCatch;
 	private Stage stage;
 	private TextButton btnX;
 	private Table leftTable;
@@ -63,14 +65,16 @@ public class GameScreen implements Screen {
 	private static final int MAXANIMALSLOST = 5;
 	private int countAnimalLost;
 	private int animalNum;
+	private float elapseTimeAnimal;
 	
-
+	
 	public GameScreen(CatchAnimals game) {
 		mainGame = game;
 		animalNum = 0;
 		animalsForSeconds = 1;
 		countAnimalLost = 0;
 		lastAnimalTime = 0;
+		elapseTimeAnimal = 0.0325f;
 		conBasket = new ControllerBasket();
 		inpBasket = new InputBasket(conBasket, mainGame);
 		basket = new Basket(mainGame, conBasket);
@@ -86,6 +90,7 @@ public class GameScreen implements Screen {
 		camera = new OrthographicCamera();
 		background = new Sprite(Assets.landscape);
 		animalCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
+		bugCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "bug.ogg"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal(Assets.music + "rain.mp3"));
 		
 		rainMusic.setLooping(true);
@@ -129,6 +134,7 @@ public class GameScreen implements Screen {
 		animalNum = animalCount;
 		countAnimalLost = 0;
 		lastAnimalTime = 0;
+		elapseTimeAnimal = 0.0325f;
 		conBasket = new ControllerBasket();
 		inpBasket = new InputBasket(conBasket, mainGame);
 		basket = new Basket(mainGame, conBasket);
@@ -144,6 +150,7 @@ public class GameScreen implements Screen {
 		camera = new OrthographicCamera();
 		background = new Sprite(Assets.landscape);
 		animalCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
+		bugCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "bug.ogg"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal(Assets.music + "rain.mp3"));
 		
 		rainMusic.setLooping(true);
@@ -198,8 +205,8 @@ public class GameScreen implements Screen {
 		mainGame.batch.begin();
 		background.draw(mainGame.batch);
 		basket.draw(mainGame.batch);
-		for (Animal raindrop : rainAnimals) {
-			raindrop.draw(mainGame.batch);
+		for (Animal animaldown : rainAnimals) {
+			animaldown.draw(mainGame.batch);
 		}
 		mainGame.batch.end();
 
@@ -284,11 +291,15 @@ public class GameScreen implements Screen {
 		labDropsColeccted.setText("Score: " + animalsGathered);
 		labTime.setText("Time: " + (int)timeCounter);
 		// check if we need to create a new rainanimals
-		if (timeCounter - lastAnimalTime >  animalsForSeconds / (timeCounter * 0.0325f)) {
+		if (timeCounter - lastAnimalTime >  animalsForSeconds / (timeCounter * elapseTimeAnimal)) {
 			spawnAnimal();
 		}
+		
+		if(timeCounter - lastBugTime > animalsForSeconds / (timeCounter * 0.01625f)){
+			spawnBug();
+		}
 
-		// move the raindrops, remove any that are beneath the bottom edge
+		// move the animal, remove any that are beneath the bottom edge
 		// of
 		// the screen or that hit the bucket. In the later case we play back
 		// a sound effect as well.
@@ -296,16 +307,21 @@ public class GameScreen implements Screen {
 		while (iter.hasNext()) {
 			Animal animal = iter.next();
 			animal.update();
-			if (animal.getY() + animal.getHeight() < 0) {
+			if ((animal.getY() + animal.getHeight() < 0) && !animal.isBug()) {
 				iter.remove();
 				countAnimalLost++;
 			}
 
 			if (animal.getRectangle().overlaps(basket.getRectangle())) {
-				animalsGathered++;
-				Gdx.input.vibrate(100);
-				animalCatch.play();
-				iter.remove();
+				if (animal.isBug()) {
+					gameState = GameState.GAMEOVER;
+					bugCatch.play();
+				} else {
+					animalsGathered++;
+					Gdx.input.vibrate(100);
+					animalCatch.play();
+					iter.remove();
+				}
 			}
 		}
 	}
@@ -343,9 +359,16 @@ public class GameScreen implements Screen {
 	}
 
 	private void spawnAnimal() {
-		Animal rainAnimal = new Animal(mainGame, Assets.animalsList.get(animalNum));
+		Animal rainAnimal = new Animal(mainGame, Assets.animalsList.get(animalNum), false);
 		rainAnimals.add(rainAnimal);
 		lastAnimalTime = timeCounter;
+	}
+	
+	private void spawnBug(){
+		int bugNum = (int) (Math.random()*Assets.bugList.size());
+		Animal rainBug = new Animal(mainGame, Assets.bugList.get(bugNum), true);
+		rainAnimals.add(rainBug);
+		lastBugTime = timeCounter;
 	}
 	
 	private void resetGame() {
@@ -353,6 +376,7 @@ public class GameScreen implements Screen {
 		timeCounter = 0;
 		animalsGathered = 0;
 		lastAnimalTime = 0;
+		lastBugTime = 0;
 		Iterator<Animal> iter = rainAnimals.iterator();
 		while (iter.hasNext()) {
 			iter.next();

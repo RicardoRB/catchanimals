@@ -1,3 +1,5 @@
+## System
+*.db
 ## Java
 
 *.class

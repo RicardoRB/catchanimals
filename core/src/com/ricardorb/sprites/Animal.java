@@ -14,11 +14,13 @@ import com.ricardorb.catchanimals.CatchAnimals;
 public class Animal extends Element {
 	
 	private static final int DROPVELX = 300;
+	private boolean bug;
 	
-	public Animal(CatchAnimals game, TextureRegion textureRegion){
+	public Animal(CatchAnimals game, TextureRegion textureRegion, boolean bug){
 		super(textureRegion, game);
 		setX(MathUtils.random(0, game.WINDOWX - getWidth()));
 		setY(game.WINDOWY);
+		this.bug = bug;
 	}
 
 	public void update(){
@@ -29,6 +31,10 @@ public class Animal extends Element {
 
 	public static int getDropvelx() {
 		return DROPVELX;
+	}
+
+	public boolean isBug() {
+		return bug;
 	}
 
 }

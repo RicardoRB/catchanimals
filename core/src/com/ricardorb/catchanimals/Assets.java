@@ -13,7 +13,9 @@ public class Assets {
 	public static TextureRegion cow, bear, cat, elephant, elk, frog;
 	public static TextureRegion gnu, hand, kangaroo, landscape, leopard, monkey;
 	public static TextureRegion owl, pig, sheep, squirrel, arrow;
+	public static TextureRegion housefly, caterpillar;
 	public static ArrayList<TextureRegion> animalsList;
+	public static ArrayList<TextureRegion> bugList;
 	public static Skin skin;
 	public static String effects;
 	public static String music;
@@ -43,6 +45,8 @@ public class Assets {
 		pig = atlas.findRegion("pig");
 		sheep = atlas.findRegion("sheep");
 		squirrel = atlas.findRegion("squirrel");
+		housefly = atlas.findRegion("housefly");
+		caterpillar = atlas.findRegion("caterpillar");
 		arrow = atlas.findRegion("arrow");
 		skin = new Skin(Gdx.files.internal(data + "uiskin.json"));
 		
@@ -61,6 +65,10 @@ public class Assets {
 		animalsList.add(pig);
 		animalsList.add(sheep);
 		animalsList.add(squirrel);
+		
+		bugList = new ArrayList<TextureRegion>();
+		bugList.add(housefly);
+		bugList.add(caterpillar);
 		
 	}
 
