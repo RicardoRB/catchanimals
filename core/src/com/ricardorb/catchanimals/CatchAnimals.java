@@ -2,6 +2,7 @@ package com.ricardorb.catchanimals;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.ricardorb.controllers.ControllerOption;
 import com.ricardorb.screens.MainMenuScreen;
 
 public class CatchAnimals extends Game {
@@ -12,6 +13,7 @@ public class CatchAnimals extends Game {
 
 	public void create() {
 		Assets.load();
+		ControllerOption.load();
 		batch = new SpriteBatch();
 		this.setScreen(new MainMenuScreen(this));
 	}

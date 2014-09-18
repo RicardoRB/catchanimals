@@ -10,6 +10,9 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -21,6 +24,7 @@ import com.badlogic.gdx.utils.Array;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 import com.ricardorb.controllers.ControllerBasket;
+import com.ricardorb.controllers.ControllerOption;
 import com.ricardorb.inputs.InputBasket;
 import com.ricardorb.sprites.Animal;
 import com.ricardorb.sprites.Basket;
@@ -34,12 +38,13 @@ public class GameScreen implements Screen {
 		RESUME,
 		STOPPED,
 		GAMEOVER,
+		OPTIONS,
 		QUIT
 	}
 	
 	private float animalsForSeconds;
 	private Basket basket;
-	private CatchAnimals mainGame;
+	private final CatchAnimals mainGame;
 	private InputBasket inpBasket;
 	private ControllerBasket conBasket;
 	private Music rainMusic;
@@ -51,6 +56,8 @@ public class GameScreen implements Screen {
 	private Sound bugCatch;
 	private Stage stage;
 	private TextButton btnX;
+	private TextButton btnOptions;
+	private Table mainTable;
 	private Table leftTable;
 	private Table rightTable;
 	private Table centerTable;
@@ -66,67 +73,8 @@ public class GameScreen implements Screen {
 	private int countAnimalLost;
 	private int animalNum;
 	private float elapseTimeAnimal;
+	private ShapeRenderer recFinger;
 	
-	
-	public GameScreen(CatchAnimals game) {
-		mainGame = game;
-		animalNum = 0;
-		animalsForSeconds = 1;
-		countAnimalLost = 0;
-		lastAnimalTime = 0;
-		elapseTimeAnimal = 0.0325f;
-		conBasket = new ControllerBasket();
-		inpBasket = new InputBasket(conBasket, mainGame);
-		basket = new Basket(mainGame, conBasket);
-		rainAnimals = new Array<Animal>();
-		stage = new Stage();
-		btnX = new TextButton("X", Assets.skin);
-		leftTable = new Table(Assets.skin);
-		rightTable = new Table(Assets.skin);
-		centerTable = new Table(Assets.skin);
-		inputMulti = new InputMultiplexer();
-		labDropsColeccted = new Label("Score: ", Assets.skin);
-		labTime = new Label("Time: ", Assets.skin);
-		camera = new OrthographicCamera();
-		background = new Sprite(Assets.landscape);
-		animalCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
-		bugCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "bug.ogg"));
-		rainMusic = Gdx.audio.newMusic(Gdx.files.internal(Assets.music + "rain.mp3"));
-		
-		rainMusic.setLooping(true);
-		camera.setToOrtho(false,mainGame.WINDOWX, mainGame.WINDOWY);
-		//With this boolean it wont draw more than 1 dialog
-		showDialog = false;
-		gameState = GameState.RUN;
-		leftTable.setFillParent(true);
-		rightTable.setFillParent(true);
-		centerTable.setFillParent(true);
-		leftTable.top().left();
-		leftTable.add(labDropsColeccted);
-		rightTable.add(btnX).size(40f, 40f);
-		rightTable.top().right();
-		centerTable.add(labTime);
-		centerTable.top();
-		
-		stage.addActor(leftTable);
-		stage.addActor(rightTable);
-		stage.addActor(centerTable);
-		
-		btnX.addListener(new ClickListener(){
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				gameState = GameState.STOPPED;
-			}
-		});
-		
-		//Adding every input in multiplexer
-		inputMulti.addProcessor(stage);
-		inputMulti.addProcessor(inpBasket);
-		
-		Gdx.input.setInputProcessor(inputMulti);
-		
-		spawnAnimal();
-	}
 
 	public GameScreen(CatchAnimals game, int animalCount) {
 		mainGame = game;
@@ -141,6 +89,8 @@ public class GameScreen implements Screen {
 		rainAnimals = new Array<Animal>();
 		stage = new Stage();
 		btnX = new TextButton("X", Assets.skin);
+		btnOptions = new TextButton("O", Assets.skin);
+		mainTable = new Table(Assets.skin);
 		leftTable = new Table(Assets.skin);
 		rightTable = new Table(Assets.skin);
 		centerTable = new Table(Assets.skin);
@@ -152,30 +102,40 @@ public class GameScreen implements Screen {
 		animalCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
 		bugCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "bug.ogg"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal(Assets.music + "rain.mp3"));
+		recFinger = new ShapeRenderer();
 		
 		rainMusic.setLooping(true);
 		camera.setToOrtho(false, mainGame.WINDOWX, mainGame.WINDOWY);
 		//With this boolean it wont draw more than 1 dialog
 		showDialog = false;
 		gameState = GameState.RUN;
-		leftTable.setFillParent(true);
-		rightTable.setFillParent(true);
-		centerTable.setFillParent(true);
-		leftTable.top().left();
-		leftTable.add(labDropsColeccted);
-		rightTable.add(btnX).size(40f, 40f);
-		rightTable.top().right();
-		centerTable.add(labTime);
-		centerTable.top();
 		
-		stage.addActor(leftTable);
-		stage.addActor(rightTable);
-		stage.addActor(centerTable);
+		mainTable.setFillParent(true);
+		
+		leftTable.add(labDropsColeccted);
+		mainTable.add(leftTable).expandY().expandX().top().left();
+		//leftTable.top().left();
+		
+		mainTable.add(centerTable).expandY().top();
+		centerTable.add(labTime);
+		
+		mainTable.add(rightTable).expand().top().right();
+		rightTable.add(btnOptions).size(40f, 40f);
+		rightTable.add(btnX).size(40f, 40f);
+		
+		stage.addActor(mainTable);
 		
 		btnX.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				gameState = GameState.STOPPED;
+			}
+		});
+		
+		btnOptions.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				gameState = GameState.OPTIONS;
 			}
 		});
 		
@@ -204,12 +164,21 @@ public class GameScreen implements Screen {
 		// all drops
 		mainGame.batch.begin();
 		background.draw(mainGame.batch);
+		
 		basket.draw(mainGame.batch);
 		for (Animal animaldown : rainAnimals) {
 			animaldown.draw(mainGame.batch);
 		}
 		mainGame.batch.end();
-
+		
+		if(ControllerOption.barFinger){
+			recFinger.setProjectionMatrix(camera.combined);
+			recFinger.begin(ShapeType.Filled);
+			recFinger.setColor(0.529f, 0.807f, 0.921f, 1f);
+			recFinger.rectLine(new Vector2(0, basket.getHeight()/2), new Vector2(mainGame.WINDOWX, basket.getHeight()/2), basket.getHeight());
+			recFinger.end();
+		}
+		
 		stage.act(Math.min(delta, 1 / 30f));
 		stage.draw();
 		
@@ -220,16 +189,7 @@ public class GameScreen implements Screen {
 
 		case PAUSE:
 			if(!showDialog){
-				showDialog = true;
-				new Dialog("Pause", Assets.skin, "dialog") {
-					protected void result(Object object) {
-						boolean confirmation = (Boolean) object;
-						if (confirmation) {
-							gameState = GameState.RESUME;
-							showDialog = false;
-						}
-					}
-				}.text("Resume game?").button("Resume", true).show(stage);
+				pauseGame();
 			}
 			break;
 
@@ -269,8 +229,13 @@ public class GameScreen implements Screen {
 			}
 			break;
 			
+		case OPTIONS:
+			mainGame.setScreen(new OptionScreen(mainGame, this));
+			break;
+			
 		case QUIT:
 			mainGame.setScreen(new MainMenuScreen(mainGame));
+			this.dispose();
 			break;
 
 		default:
@@ -278,6 +243,19 @@ public class GameScreen implements Screen {
 		}
 
 		
+	}
+
+	private void pauseGame() {
+		showDialog = true;
+		new Dialog("Pause", Assets.skin, "dialog") {
+			protected void result(Object object) {
+				boolean confirmation = (Boolean) object;
+				if (confirmation) {
+					gameState = GameState.RESUME;
+					showDialog = false;
+				}
+			}
+		}.text("Resume game?").button("Resume", true).show(stage);
 	}
 
 	private void runGame(float delta) {
@@ -307,9 +285,12 @@ public class GameScreen implements Screen {
 		while (iter.hasNext()) {
 			Animal animal = iter.next();
 			animal.update();
-			if ((animal.getY() + animal.getHeight() < 0) && !animal.isBug()) {
+			
+			if (animal.getY() + animal.getHeight() < 0) {
 				iter.remove();
-				countAnimalLost++;
+				if(!animal.isBug()){
+					countAnimalLost++;
+				}
 			}
 
 			if (animal.getRectangle().overlaps(basket.getRectangle())) {
@@ -334,6 +315,8 @@ public class GameScreen implements Screen {
 	@Override
 	public void show() {
 		rainMusic.play();
+		barFingerChange();
+		Gdx.input.setInputProcessor(inputMulti);
 	}
 
 	@Override
@@ -384,6 +367,19 @@ public class GameScreen implements Screen {
 		}
 		spawnAnimal();
 		gameState = GameState.RUN;
+	}
+	
+	private void barFingerChange(){
+		if(ControllerOption.barFinger){
+			basket.setPosition(basket.getX(), basket.getY() + basket.getHeight());
+			background.setSize(background.getWidth(), background.getHeight() - basket.getHeight());
+			background.setPosition(0, basket.getHeight());
+		} else {
+			basket.setPosition(basket.getX(), 0);
+			background.setSize(background.getWidth(), background.getHeight() + basket.getHeight());
+			background.setPosition(0, 0);
+			
+		}
 	}
 
 }

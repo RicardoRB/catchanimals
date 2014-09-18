@@ -23,7 +23,13 @@ public class MainMenuScreen implements Screen {
 	private Stage stage;
 	private TextButton btnStartGame;
 	private TextButton btnExit;
+	private TextButton btnOptions;
+	private TextButton btnMusic;
+	private TextButton btnEffets;
 	private Table buttonsTable;
+	private Table selectTable;
+	private Table soundsTable;
+	private Table menuButton;
 	private Image arrowLeft;
 	private Image arrowRight;
 	private ArrayList<TextureRegion> animalsList;
@@ -36,7 +42,13 @@ public class MainMenuScreen implements Screen {
 		stage = new Stage();
 		btnStartGame = new TextButton("Start Game", Assets.skin);
 		btnExit = new TextButton("Exit", Assets.skin);
+		btnOptions = new TextButton("Options", Assets.skin);
+		btnMusic = new TextButton("Music", Assets.skin);
+		btnEffets = new TextButton("Effects", Assets.skin);
 		buttonsTable = new Table(Assets.skin);
+		selectTable = new Table(Assets.skin);
+		soundsTable = new Table(Assets.skin);
+		menuButton = new Table(Assets.skin);
 		arrowLeft = new Image(Assets.arrow);
 		arrowRight = new Image(Assets.arrow);
 		animalsList = Assets.animalsList;
@@ -47,17 +59,24 @@ public class MainMenuScreen implements Screen {
 		
 		//Buttons structure
 		buttonsTable.setFillParent(true);
-		buttonsTable.center();
-		buttonsTable.add(btnStartGame).size(100f, 50f);
-		buttonsTable.row();
-		buttonsTable.add(arrowLeft);
+		
+		soundsTable.add(btnMusic);
+		soundsTable.add(btnEffets);
+		soundsTable.add(btnOptions);
+		buttonsTable.add(soundsTable).expandX().expandY().right().top().row();
+		
+		selectTable.add(arrowLeft);
 		Image auxAnimal = new Image(animalsList.get(animalCount));
-		buttonsTable.add(auxAnimal);
-		buttonsTable.add(arrowRight);
-		buttonsTable.row();
-		buttonsTable.add(btnExit).size(100f, 50f);
+		selectTable.add(auxAnimal);
+		selectTable.add(arrowRight);
+		buttonsTable.add(selectTable).expandY().center().row();
+		
+		menuButton.add(btnStartGame).size(100f, 50f).padRight(60f);
+		menuButton.add(btnExit).size(100f, 50f);
+		buttonsTable.add(menuButton);
 		
 		stage.addActor(buttonsTable);
+		
 		
 		clickSound = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "click.ogg"));
 
@@ -77,6 +96,13 @@ public class MainMenuScreen implements Screen {
 			}
 		});
 		
+		btnOptions.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				GAME.setScreen(new OptionScreen(GAME, MainMenuScreen.this));
+			}
+		});
+		
 		arrowLeft.addListener(new ClickListener(){
 			@SuppressWarnings("unchecked")
 			@Override
@@ -90,7 +116,7 @@ public class MainMenuScreen implements Screen {
 					animalCount = animalsList.size() - 1;
 				}
 					Image auxAnimal = new Image(animalsList.get(animalCount));
-					buttonsTable.getCells().get(2).setActor(auxAnimal);
+					selectTable.getCells().get(1).setActor(auxAnimal);
 			}
 		});
 		
@@ -107,7 +133,7 @@ public class MainMenuScreen implements Screen {
 					animalCount = 0;
 				}
 					Image auxAnimal = new Image(animalsList.get(animalCount));
-					buttonsTable.getCells().get(2).setActor(auxAnimal);
+					selectTable.getCells().get(1).setActor(auxAnimal);
 				
 			}
 		});
@@ -124,7 +150,6 @@ public class MainMenuScreen implements Screen {
 		//235/255 = 0.921
 		Gdx.gl.glClearColor(0.529f, 0.807f, 0.921f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
 		stage.act(Math.min(delta, 1 / 30f));
 		stage.draw();
 		
@@ -137,26 +162,19 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
