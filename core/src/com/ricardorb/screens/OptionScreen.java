@@ -37,9 +37,9 @@ public class OptionScreen implements Screen {
 		cbEffectsOn = new CheckBox("Turn effects On/Off", Assets.skin);
 		btnBack = new TextButton("Back", Assets.skin);
 		
-		cbBarFinger.setChecked(ControllerOption.barFinger);
-		cbMusicOn.setChecked(ControllerOption.musicOn);
-		cbEffectsOn.setChecked(ControllerOption.effectsOn);
+		cbBarFinger.setChecked(ControllerOption.isBarFinger());
+		cbMusicOn.setChecked(ControllerOption.isMusicOn());
+		cbEffectsOn.setChecked(ControllerOption.isEffectsOn());
 		
 		mainTable.setFillParent(true);
 		mainTable.add(lblOptions).top().row();
@@ -60,21 +60,21 @@ public class OptionScreen implements Screen {
 		cbBarFinger.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				ControllerOption.barFinger = cbBarFinger.isChecked();
+				ControllerOption.setBarFinger(cbBarFinger.isChecked());
 			}
 		});
 		
 		cbMusicOn.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				ControllerOption.musicOn = cbMusicOn.isChecked();
+				ControllerOption.setMusicOn(cbMusicOn.isChecked());
 			}
 		});
 		
 		cbEffectsOn.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				ControllerOption.effectsOn = cbEffectsOn.isChecked();
+				ControllerOption.setEffectsOn(cbEffectsOn.isChecked());
 			}
 		});
 		

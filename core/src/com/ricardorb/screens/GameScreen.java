@@ -171,7 +171,7 @@ public class GameScreen implements Screen {
 		}
 		mainGame.batch.end();
 		
-		if(ControllerOption.barFinger){
+		if(ControllerOption.isBarFinger()){
 			recFinger.setProjectionMatrix(camera.combined);
 			recFinger.begin(ShapeType.Filled);
 			recFinger.setColor(0.529f, 0.807f, 0.921f, 1f);
@@ -370,7 +370,7 @@ public class GameScreen implements Screen {
 	}
 	
 	private void barFingerChange(){
-		if(ControllerOption.barFinger){
+		if(ControllerOption.isBarFinger()){
 			basket.setPosition(basket.getX(), basket.getY() + basket.getHeight());
 			background.setSize(background.getWidth(), background.getHeight() - basket.getHeight());
 			background.setPosition(0, basket.getHeight());
