@@ -2,6 +2,7 @@ package com.ricardorb.controllers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.audio.Sound;
 
 public class ControllerOption {
 	
@@ -66,6 +67,12 @@ public class ControllerOption {
 	public static void setNotFirstTime(boolean notFirstTime) {
 		prefs.putBoolean("notFirstTime", notFirstTime);
 		prefs.flush();
+	}
+	
+	public static void playSound(Sound sound){
+		if(isEffectsOn()){
+			sound.play();
+		}
 	}
 	
 }

@@ -52,8 +52,8 @@ public class GameScreen implements Screen {
 	private float lastAnimalTime;
 	private float lastBugTime;
 	private int animalsGathered;
-	private Sound animalCatch;
-	private Sound bugCatch;
+	private Sound animalCatchSound;
+	private Sound bugCatchSound;
 	private Stage stage;
 	private TextButton btnX;
 	private TextButton btnOptions;
@@ -99,8 +99,8 @@ public class GameScreen implements Screen {
 		labTime = new Label("Time: ", Assets.skin);
 		camera = new OrthographicCamera();
 		background = new Sprite(Assets.landscape);
-		animalCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
-		bugCatch = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "bug.ogg"));
+		animalCatchSound = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
+		bugCatchSound = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "bug.ogg"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal(Assets.music + "rain.mp3"));
 		recFinger = new ShapeRenderer();
 		
@@ -296,11 +296,11 @@ public class GameScreen implements Screen {
 			if (animal.getRectangle().overlaps(basket.getRectangle())) {
 				if (animal.isBug()) {
 					gameState = GameState.GAMEOVER;
-					bugCatch.play();
+					ControllerOption.playSound(bugCatchSound);
 				} else {
 					animalsGathered++;
 					Gdx.input.vibrate(100);
-					animalCatch.play();
+					ControllerOption.playSound(animalCatchSound);
 					iter.remove();
 				}
 			}
@@ -314,7 +314,9 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-		rainMusic.play();
+		if(ControllerOption.isMusicOn()){
+			rainMusic.play();
+		}
 		barFingerChange();
 		Gdx.input.setInputProcessor(inputMulti);
 	}
@@ -333,12 +335,16 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resume() {
-		rainMusic.play();
+		if(ControllerOption.isMusicOn()){
+			rainMusic.play();
+		}
 	}
 
 	@Override
 	public void dispose() {
 		rainMusic.dispose();
+		bugCatchSound.dispose();
+		animalCatchSound.dispose();
 	}
 
 	private void spawnAnimal() {

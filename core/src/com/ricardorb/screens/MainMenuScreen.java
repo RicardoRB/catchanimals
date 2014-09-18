@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
+import com.ricardorb.controllers.ControllerOption;
 
 public class MainMenuScreen implements Screen {
 
@@ -109,7 +110,7 @@ public class MainMenuScreen implements Screen {
 			public void clicked(InputEvent event, float x, float y) {
 				arrowLeft.addAction(Actions.sequence(Actions.moveBy(-10f, 0, 0.1f),
 						Actions.moveBy(8f, 0, 0.1f)));
-				clickSound.play();
+				ControllerOption.playSound(clickSound);
 				if(animalCount > 0){
 					animalCount--;
 				} else {
@@ -126,7 +127,7 @@ public class MainMenuScreen implements Screen {
 			public void clicked(InputEvent event, float x, float y) {
 				arrowRight.addAction(Actions.sequence(Actions.moveBy(10f, 0, 0.1f),
 						Actions.moveBy(-8f, 0, 0.1f)));
-				clickSound.play();
+				ControllerOption.playSound(clickSound);
 				if(animalCount < animalsList.size() - 1){
 					animalCount++;
 				} else {
@@ -180,6 +181,7 @@ public class MainMenuScreen implements Screen {
 	@Override
 	public void dispose() {
 		stage.dispose();
+		clickSound.dispose();
 	}
 
 }
