@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 import com.ricardorb.controllers.ControllerBasket;
@@ -44,7 +45,7 @@ public class GameScreen implements Screen {
 	
 	private float animalsForSeconds;
 	private Basket basket;
-	private final CatchAnimals mainGame;
+	private final CatchAnimals GAME;
 	private InputBasket inpBasket;
 	private ControllerBasket conBasket;
 	private Music rainMusic;
@@ -74,20 +75,26 @@ public class GameScreen implements Screen {
 	private int animalNum;
 	private float elapseTimeAnimal;
 	private ShapeRenderer recFinger;
+	private float basketPostBarFing;
+	private float backgroundSizeBarFing;
 	
 
 	public GameScreen(CatchAnimals game, int animalCount) {
-		mainGame = game;
+		GAME = game;
 		animalsForSeconds = 1;
 		animalNum = animalCount;
 		countAnimalLost = 0;
 		lastAnimalTime = 0;
 		elapseTimeAnimal = 0.0325f;
 		conBasket = new ControllerBasket();
-		inpBasket = new InputBasket(conBasket, mainGame);
-		basket = new Basket(mainGame, conBasket);
+		inpBasket = new InputBasket(conBasket, GAME);
+		basket = new Basket(GAME, conBasket);
 		rainAnimals = new Array<Animal>();
-		stage = new Stage();
+		if(Gdx.graphics.getWidth() < GAME.WINDOWX && Gdx.graphics.getHeight() < GAME.WINDOWY){
+			stage = new Stage();
+		} else {
+			stage = new Stage(new FillViewport(GAME.WINDOWX, GAME.WINDOWY));
+		}
 		btnX = new TextButton("X", Assets.skin);
 		btnOptions = new TextButton("O", Assets.skin);
 		mainTable = new Table(Assets.skin);
@@ -104,8 +111,13 @@ public class GameScreen implements Screen {
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal(Assets.music + "rain.mp3"));
 		recFinger = new ShapeRenderer();
 		
+		//With this vars the basket will not move up and background will not decrease size
+		//if you check the barFinger twice in menu options
+		basketPostBarFing = basket.getY() + basket.getHeight();
+		backgroundSizeBarFing = background.getHeight() - basket.getHeight();
+		
 		rainMusic.setLooping(true);
-		camera.setToOrtho(false, mainGame.WINDOWX, mainGame.WINDOWY);
+		camera.setToOrtho(false, GAME.WINDOWX, GAME.WINDOWY);
 		//With this boolean it wont draw more than 1 dialog
 		showDialog = false;
 		gameState = GameState.RUN;
@@ -119,7 +131,7 @@ public class GameScreen implements Screen {
 		mainTable.add(centerTable).expandY().top();
 		centerTable.add(labTime);
 		
-		mainTable.add(rightTable).expand().top().right();
+		mainTable.add(rightTable).expand().top().right().pad(5f);
 		rightTable.add(btnOptions).size(40f, 40f);
 		rightTable.add(btnX).size(40f, 40f);
 		
@@ -159,23 +171,23 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		// tell the camera to update its matrices.
 		camera.update();
-		mainGame.batch.setProjectionMatrix(camera.combined);
+		GAME.batch.setProjectionMatrix(camera.combined);
 		// begin a new batch and draw the bucket and
 		// all drops
-		mainGame.batch.begin();
-		background.draw(mainGame.batch);
+		GAME.batch.begin();
+		background.draw(GAME.batch);
 		
-		basket.draw(mainGame.batch);
+		basket.draw(GAME.batch);
 		for (Animal animaldown : rainAnimals) {
-			animaldown.draw(mainGame.batch);
+			animaldown.draw(GAME.batch);
 		}
-		mainGame.batch.end();
+		GAME.batch.end();
 		
 		if(ControllerOption.isBarFinger()){
 			recFinger.setProjectionMatrix(camera.combined);
 			recFinger.begin(ShapeType.Filled);
 			recFinger.setColor(0.529f, 0.807f, 0.921f, 1f);
-			recFinger.rectLine(new Vector2(0, basket.getHeight()/2), new Vector2(mainGame.WINDOWX, basket.getHeight()/2), basket.getHeight());
+			recFinger.rectLine(new Vector2(0, basket.getHeight()/2), new Vector2(GAME.WINDOWX, basket.getHeight()/2), basket.getHeight());
 			recFinger.end();
 		}
 		
@@ -222,7 +234,7 @@ public class GameScreen implements Screen {
 						if(confirmation){
 							resetGame();
 						} else {
-							mainGame.setScreen(new MainMenuScreen(mainGame));
+							GAME.setScreen(new MainMenuScreen(GAME));
 						}
 					}
 				}.text("Your score " + animalsGathered + ". Retry?").button("Yes", true).button("Go to menu", false).show(stage);
@@ -230,11 +242,11 @@ public class GameScreen implements Screen {
 			break;
 			
 		case OPTIONS:
-			mainGame.setScreen(new OptionScreen(mainGame, this));
+			GAME.setScreen(new OptionScreen(GAME, this));
 			break;
 			
 		case QUIT:
-			mainGame.setScreen(new MainMenuScreen(mainGame));
+			GAME.setScreen(new MainMenuScreen(GAME));
 			this.dispose();
 			break;
 
@@ -348,14 +360,14 @@ public class GameScreen implements Screen {
 	}
 
 	private void spawnAnimal() {
-		Animal rainAnimal = new Animal(mainGame, Assets.animalsList.get(animalNum), false);
+		Animal rainAnimal = new Animal(GAME, Assets.animalsList.get(animalNum), false);
 		rainAnimals.add(rainAnimal);
 		lastAnimalTime = timeCounter;
 	}
 	
 	private void spawnBug(){
 		int bugNum = (int) (Math.random()*Assets.bugList.size());
-		Animal rainBug = new Animal(mainGame, Assets.bugList.get(bugNum), true);
+		Animal rainBug = new Animal(GAME, Assets.bugList.get(bugNum), true);
 		rainAnimals.add(rainBug);
 		lastBugTime = timeCounter;
 	}
@@ -377,14 +389,13 @@ public class GameScreen implements Screen {
 	
 	private void barFingerChange(){
 		if(ControllerOption.isBarFinger()){
-			basket.setPosition(basket.getX(), basket.getY() + basket.getHeight());
-			background.setSize(background.getWidth(), background.getHeight() - basket.getHeight());
+			basket.setPosition(basket.getX(), basketPostBarFing);
+			background.setSize(background.getWidth(), backgroundSizeBarFing);
 			background.setPosition(0, basket.getHeight());
 		} else {
 			basket.setPosition(basket.getX(), 0);
 			background.setSize(background.getWidth(), background.getHeight() + basket.getHeight());
 			background.setPosition(0, 0);
-			
 		}
 	}
 

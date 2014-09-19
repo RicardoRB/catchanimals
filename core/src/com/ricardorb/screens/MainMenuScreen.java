@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 import com.ricardorb.controllers.ControllerOption;
@@ -40,7 +41,11 @@ public class MainMenuScreen implements Screen {
 	public MainMenuScreen(final CatchAnimals gam) {
 		//Initialize objects
 		GAME = gam;
-		stage = new Stage();
+		if(Gdx.graphics.getWidth() < GAME.WINDOWX && Gdx.graphics.getHeight() < GAME.WINDOWY){
+			stage = new Stage();
+		} else {
+			stage = new Stage(new FillViewport(GAME.WINDOWX, GAME.WINDOWY));
+		}
 		btnStartGame = new TextButton("Start Game", Assets.skin);
 		btnExit = new TextButton("Exit", Assets.skin);
 		btnOptions = new TextButton("Options", Assets.skin);
@@ -64,7 +69,7 @@ public class MainMenuScreen implements Screen {
 		soundsTable.add(btnMusic);
 		soundsTable.add(btnEffets);
 		soundsTable.add(btnOptions);
-		buttonsTable.add(soundsTable).expandX().expandY().right().top().row();
+		buttonsTable.add(soundsTable).expandX().expandY().right().top().row().pad(5f);
 		
 		selectTable.add(arrowLeft);
 		Image auxAnimal = new Image(animalsList.get(animalCount));
@@ -74,7 +79,7 @@ public class MainMenuScreen implements Screen {
 		
 		menuButton.add(btnStartGame).size(100f, 50f).padRight(60f);
 		menuButton.add(btnExit).size(100f, 50f);
-		buttonsTable.add(menuButton);
+		buttonsTable.add(menuButton).pad(5f);
 		
 		stage.addActor(buttonsTable);
 		
