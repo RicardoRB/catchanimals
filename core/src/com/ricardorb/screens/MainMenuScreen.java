@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
+import com.ricardorb.catchanimals.Constants;
 import com.ricardorb.controllers.ControllerOption;
 
 public class MainMenuScreen implements Screen {
@@ -41,11 +42,11 @@ public class MainMenuScreen implements Screen {
 		//Initialize objects
 		GAME = gam;
 		stage = new Stage();
-		btnStartGame = new TextButton("Start Game", Assets.skin);
-		btnExit = new TextButton("Exit", Assets.skin);
-		btnOptions = new TextButton("Options", Assets.skin);
-		btnMusic = new TextButton("Music", Assets.skin);
-		btnEffets = new TextButton("Effects", Assets.skin);
+		btnStartGame = new TextButton(Constants.TXTSTARTGAME, Assets.skin);
+		btnExit = new TextButton(Constants.TXTEXIT, Assets.skin);
+		btnOptions = new TextButton(Constants.TXTOPTIONS, Assets.skin);
+		btnMusic = new TextButton(Constants.TXTMUSIC, Assets.skin);
+		btnEffets = new TextButton(Constants.TXTEFFECTS, Assets.skin);
 		buttonsTable = new Table(Assets.skin);
 		selectTable = new Table(Assets.skin);
 		soundsTable = new Table(Assets.skin);

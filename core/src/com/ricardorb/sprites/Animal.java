@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.ricardorb.catchanimals.CatchAnimals;
+import com.ricardorb.catchanimals.Constants;
 
 /**
  * Every drop in the game that the user should catch
@@ -18,8 +19,8 @@ public class Animal extends Element {
 	
 	public Animal(CatchAnimals game, TextureRegion textureRegion, boolean bug){
 		super(textureRegion, game);
-		setX(MathUtils.random(0, game.WINDOWX - getWidth()));
-		setY(game.WINDOWY);
+		setX(MathUtils.random(0, Constants.WINDOWX - getWidth()));
+		setY(Constants.WINDOWY);
 		this.bug = bug;
 	}
 

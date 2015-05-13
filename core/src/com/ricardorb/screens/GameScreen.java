@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
+import com.ricardorb.catchanimals.Constants;
 import com.ricardorb.controllers.ControllerBasket;
 import com.ricardorb.controllers.ControllerOption;
 import com.ricardorb.inputs.InputBasket;
@@ -88,15 +89,15 @@ public class GameScreen implements Screen {
 		basket = new Basket(mainGame, conBasket);
 		rainAnimals = new Array<Animal>();
 		stage = new Stage();
-		btnX = new TextButton("X", Assets.skin);
-		btnOptions = new TextButton("O", Assets.skin);
+		btnX = new TextButton(Constants.BTNEXITGAME, Assets.skin);
+		btnOptions = new TextButton(Constants.BTNOPTIONS, Assets.skin);
 		mainTable = new Table(Assets.skin);
 		leftTable = new Table(Assets.skin);
 		rightTable = new Table(Assets.skin);
 		centerTable = new Table(Assets.skin);
 		inputMulti = new InputMultiplexer();
-		labDropsColeccted = new Label("Score: ", Assets.skin);
-		labTime = new Label("Time: ", Assets.skin);
+		labDropsColeccted = new Label(Constants.TXTSCORE, Assets.skin);
+		labTime = new Label(Constants.TXTTIME, Assets.skin);
 		camera = new OrthographicCamera();
 		background = new Sprite(Assets.landscape);
 		animalCatchSound = Gdx.audio.newSound(Gdx.files.internal(Assets.effects + "cow.ogg"));
@@ -105,7 +106,7 @@ public class GameScreen implements Screen {
 		recFinger = new ShapeRenderer();
 		
 		rainMusic.setLooping(true);
-		camera.setToOrtho(false, mainGame.WINDOWX, mainGame.WINDOWY);
+		camera.setToOrtho(false, Constants.WINDOWX, Constants.WINDOWY);
 		//With this boolean it wont draw more than 1 dialog
 		showDialog = false;
 		gameState = GameState.RUN;
@@ -175,7 +176,7 @@ public class GameScreen implements Screen {
 			recFinger.setProjectionMatrix(camera.combined);
 			recFinger.begin(ShapeType.Filled);
 			recFinger.setColor(0.529f, 0.807f, 0.921f, 1f);
-			recFinger.rectLine(new Vector2(0, basket.getHeight()/2), new Vector2(mainGame.WINDOWX, basket.getHeight()/2), basket.getHeight());
+			recFinger.rectLine(new Vector2(0, basket.getHeight()/2), new Vector2(Constants.WINDOWX, basket.getHeight()/2), basket.getHeight());
 			recFinger.end();
 		}
 		
@@ -200,21 +201,21 @@ public class GameScreen implements Screen {
 		case STOPPED:
 			if(!showDialog){
 				showDialog = true;
-				new Dialog("Pause", Assets.skin, "dialog") {
+				new Dialog(Constants.TXTPAUSE, Assets.skin, "dialog") {
 					protected void result(Object object) {
 
 						boolean confirmation = (Boolean) object;
 						showDialog = false;
 						gameState = confirmation ? GameState.QUIT : GameState.RESUME;
 					}
-				}.text("Are you sure you want to quit?").button("Yes", true).button("No", false).show(stage);
+				}.text(Constants.TXTEXITASK).button(Constants.TXTYES, true).button(Constants.TXTNO, false).show(stage);
 			}
 			break;
 
 		case GAMEOVER:
 			if(!showDialog){
 				showDialog = true;
-				new Dialog("Game Over", Assets.skin, "dialog") {
+				new Dialog(Constants.TXTGAMEOVER, Assets.skin, "dialog") {
 					protected void result(Object object) {
 
 						boolean confirmation = (Boolean) object;
@@ -225,7 +226,7 @@ public class GameScreen implements Screen {
 							mainGame.setScreen(new MainMenuScreen(mainGame));
 						}
 					}
-				}.text("Your score " + animalsGathered + ". Retry?").button("Yes", true).button("Go to menu", false).show(stage);
+				}.text(Constants.TXTYOURSCORE + animalsGathered + Constants.TXTRETRY).button(Constants.TXTYES, true).button(Constants.TXTBACKTOMENU, false).show(stage);
 			}
 			break;
 			
@@ -247,7 +248,7 @@ public class GameScreen implements Screen {
 
 	private void pauseGame() {
 		showDialog = true;
-		new Dialog("Pause", Assets.skin, "dialog") {
+		new Dialog(Constants.TXTPAUSE, Assets.skin, "dialog") {
 			protected void result(Object object) {
 				boolean confirmation = (Boolean) object;
 				if (confirmation) {
@@ -255,7 +256,7 @@ public class GameScreen implements Screen {
 					showDialog = false;
 				}
 			}
-		}.text("Resume game?").button("Resume", true).show(stage);
+		}.text(Constants.TXTRESUMEASK).button(Constants.TXTRESUME, true).show(stage);
 	}
 
 	private void runGame(float delta) {
@@ -266,8 +267,8 @@ public class GameScreen implements Screen {
 		timeCounter += delta;
 		
 		basket.update();
-		labDropsColeccted.setText("Score: " + animalsGathered);
-		labTime.setText("Time: " + (int)timeCounter);
+		labDropsColeccted.setText(Constants.TXTSCORE + animalsGathered);
+		labTime.setText(Constants.TXTTIME + (int)timeCounter);
 		// check if we need to create a new rainanimals
 		if (timeCounter - lastAnimalTime >  animalsForSeconds / (timeCounter * elapseTimeAnimal)) {
 			spawnAnimal();

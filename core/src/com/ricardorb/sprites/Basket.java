@@ -3,6 +3,7 @@ package com.ricardorb.sprites;
 import com.badlogic.gdx.Gdx;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
+import com.ricardorb.catchanimals.Constants;
 import com.ricardorb.controllers.ControllerBasket;
 /**
  * Bucket of the game, the user will move the bucket in the game
@@ -18,7 +19,7 @@ public class Basket extends com.ricardorb.sprites.Element{
 	
 	public Basket(final CatchAnimals game, ControllerBasket conBucket) {
 		super(Assets.basket,game);
-		setPosition(game.WINDOWX / 2 - getWidth() / 2, 20);
+		setPosition(Constants.WINDOWX / 2 - getWidth() / 2, 20);
 		setCenter(getWidth() / 2, getHeight() / 2);
 		this.conBucket = conBucket;
 	}
@@ -39,8 +40,8 @@ public class Basket extends com.ricardorb.sprites.Element{
 			setX(0);
 		}
 		
-		if (getX() > GAME.WINDOWX - getWidth()) {
-			setX(GAME.WINDOWX - getWidth());
+		if (getX() > Constants.WINDOWX - getWidth()) {
+			setX(Constants.WINDOWX - getWidth());
 		}
 		rectangle.x = getX();
 		rectangle.y = getY();

@@ -8,8 +8,7 @@ import com.ricardorb.screens.MainMenuScreen;
 public class CatchAnimals extends Game {
 
 	public SpriteBatch batch;
-	public final int WINDOWY = 480;
-	public final int WINDOWX = 800;
+	
 
 	public void create() {
 		Assets.load();

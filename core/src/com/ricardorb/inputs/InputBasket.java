@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.ricardorb.catchanimals.CatchAnimals;
+import com.ricardorb.catchanimals.Constants;
 import com.ricardorb.controllers.ControllerBasket;
 
 public class InputBasket extends InputAdapter {
@@ -24,7 +25,7 @@ public class InputBasket extends InputAdapter {
 		conBucket.setDrag(true);
 		
 		OrthographicCamera camera = new OrthographicCamera();
-		camera.setToOrtho(false, GAME.WINDOWX, GAME.WINDOWY);
+		camera.setToOrtho(false, Constants.WINDOWX, Constants.WINDOWY);
 		
 		Vector3 touchPos = new Vector3();
 		touchPos.set(screenX, screenY, 0);

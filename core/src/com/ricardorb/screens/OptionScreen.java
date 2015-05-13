@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
+import com.ricardorb.catchanimals.Constants;
 import com.ricardorb.controllers.ControllerOption;
 
 public class OptionScreen implements Screen {
@@ -31,11 +32,11 @@ public class OptionScreen implements Screen {
 		SCREEN = screen;
 		stage = new Stage();
 		mainTable = new Table(Assets.skin);
-		lblOptions = new Label("Options", Assets.skin);
-		cbBarFinger = new CheckBox("Bottom bar", Assets.skin);
-		cbMusicOn = new CheckBox("Turn music On/Off", Assets.skin);
-		cbEffectsOn = new CheckBox("Turn effects On/Off", Assets.skin);
-		btnBack = new TextButton("Back", Assets.skin);
+		lblOptions = new Label(Constants.TXTOPTIONS, Assets.skin);
+		cbBarFinger = new CheckBox(Constants.TXTBOTTOMBAR, Assets.skin);
+		cbMusicOn = new CheckBox(Constants.TXTMUSICONOFF, Assets.skin);
+		cbEffectsOn = new CheckBox(Constants.TXTEFFECTSONOFF, Assets.skin);
+		btnBack = new TextButton(Constants.TXTBACK, Assets.skin);
 		
 		cbBarFinger.setChecked(ControllerOption.isBarFinger());
 		cbMusicOn.setChecked(ControllerOption.isMusicOn());
