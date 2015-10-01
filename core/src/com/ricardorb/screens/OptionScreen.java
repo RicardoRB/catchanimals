@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.ricardorb.catchanimals.Assets;
 import com.ricardorb.catchanimals.CatchAnimals;
 import com.ricardorb.catchanimals.Constants;
@@ -30,7 +31,11 @@ public class OptionScreen implements Screen {
 	public OptionScreen(final CatchAnimals gam, final Screen screen) {
 		GAME = gam;
 		SCREEN = screen;
-		stage = new Stage();
+		if(Gdx.graphics.getWidth() < GAME.WINDOWX && Gdx.graphics.getHeight() < GAME.WINDOWY){
+			stage = new Stage();
+		} else {
+			stage = new Stage(new FillViewport(GAME.WINDOWX, GAME.WINDOWY));
+		}
 		mainTable = new Table(Assets.skin);
 		lblOptions = new Label(Constants.TXTOPTIONS, Assets.skin);
 		cbBarFinger = new CheckBox(Constants.TXTBOTTOMBAR, Assets.skin);
@@ -43,11 +48,11 @@ public class OptionScreen implements Screen {
 		cbEffectsOn.setChecked(ControllerOption.isEffectsOn());
 		
 		mainTable.setFillParent(true);
-		mainTable.add(lblOptions).top().row();
-		mainTable.add(cbMusicOn).row();
-		mainTable.add(cbEffectsOn).row();
-		mainTable.add(cbBarFinger).row();
-		mainTable.add(btnBack);
+		mainTable.add(lblOptions).expandY().top().row();
+		mainTable.add(cbMusicOn).expandY().center().row();
+		mainTable.add(cbEffectsOn).expandY().center().row();
+		mainTable.add(cbBarFinger).expandY().center().row();
+		mainTable.add(btnBack).size(100f, 50f).padBottom(5f);
 		
 		stage.addActor(mainTable);
 		
