@@ -31,10 +31,10 @@ public class OptionScreen implements Screen {
 	public OptionScreen(final CatchAnimals gam, final Screen screen) {
 		GAME = gam;
 		SCREEN = screen;
-		if(Gdx.graphics.getWidth() < GAME.WINDOWX && Gdx.graphics.getHeight() < GAME.WINDOWY){
+		if(Gdx.graphics.getWidth() < Constants.WINDOWX && Gdx.graphics.getHeight() < Constants.WINDOWY){
 			stage = new Stage();
 		} else {
-			stage = new Stage(new FillViewport(GAME.WINDOWX, GAME.WINDOWY));
+			stage = new Stage(new FillViewport(Constants.WINDOWX, Constants.WINDOWY));
 		}
 		mainTable = new Table(Assets.skin);
 		lblOptions = new Label(Constants.TXTOPTIONS, Assets.skin);
