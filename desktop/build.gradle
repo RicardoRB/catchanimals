@@ -1,46 +1,50 @@
-apply plugin: "java"
+plugins {
+    id 'application'
+}
 
-sourceCompatibility = 1.6
-sourceSets.main.java.srcDirs = [ "src/" ]
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 
-project.ext.mainClassName = "com.ricardorb.catchanimals.desktop.DesktopLauncher"
-project.ext.assetsDir = new File("../android/assets");
+sourceSets {
+    main {
+        java.srcDirs = ['src']
+        resources.srcDirs = ['../android/assets']
+    }
+}
 
-task run(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
+def assetsDir = file('../android/assets')
+def isMacOs = System.getProperty('os.name').toLowerCase().contains('mac')
+
+application {
+    mainClass = 'com.ricardorb.catchanimals.desktop.DesktopLauncher'
+    if (isMacOs) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+    }
+}
+
+dependencies {
+    implementation project(':core')
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    runtimeOnly "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+}
+
+tasks.named('run', JavaExec) {
+    workingDir = assetsDir
     standardInput = System.in
-    workingDir = project.assetsDir
     ignoreExitValue = true
 }
 
-task dist(type: Jar) {
-    from files(sourceSets.main.output.classesDir)
-    from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
-    from files(project.assetsDir);
- 
-    manifest {
-        attributes 'Main-Class': project.mainClassName
+tasks.withType(JavaExec).configureEach {
+    workingDir = assetsDir
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
     }
-}
 
-dist.dependsOn classes
-
-eclipse {
-    project {
-        name = appName + "-desktop"
-        linkedResource name: 'assets', type: '2', location: 'PARENT-1-PROJECT_LOC/android/assets'
+    if (isMacOs && !jvmArgs.contains('-XstartOnFirstThread')) {
+        jvmArgs('-XstartOnFirstThread')
     }
-}
-
-task afterEclipseImport(description: "Post processing after project generation", group: "IDE") {
-  doLast {
-    def classpath = new XmlParser().parse(file(".classpath"))
-    new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets' ]);
-    def writer = new FileWriter(file(".classpath"))
-    def printer = new XmlNodePrinter(new PrintWriter(writer))
-    printer.setPreserveWhitespace(true)
-    printer.print(classpath)
-  }
 }

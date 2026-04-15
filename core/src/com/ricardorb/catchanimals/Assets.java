@@ -3,6 +3,7 @@ package com.ricardorb.catchanimals;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -27,7 +28,7 @@ public class Assets {
 		music = "sounds/music/";
 		data = "data/";
 		images = "images/";
-		atlas = new TextureAtlas(Gdx.files.internal(images + "imageAtlas.atlas"));
+		atlas = new TextureAtlas(resolveAsset(images + "imageAtlas.atlas"));
 		basket = atlas.findRegion("basket");
 		cow = atlas.findRegion("cow");
 		bear = atlas.findRegion("bear");
@@ -48,7 +49,7 @@ public class Assets {
 		housefly = atlas.findRegion("housefly");
 		caterpillar = atlas.findRegion("caterpillar");
 		arrow = atlas.findRegion("arrow");
-		skin = new Skin(Gdx.files.internal(data + "uiskin.json"));
+		skin = new Skin(resolveAsset(data + "uiskin.json"));
 		
 		animalsList = new ArrayList<TextureRegion>();
 		animalsList.add(cow);
@@ -70,6 +71,14 @@ public class Assets {
 		bugList.add(housefly);
 		bugList.add(caterpillar);
 		
+	}
+
+	private static FileHandle resolveAsset(String path) {
+		FileHandle internal = Gdx.files.internal(path);
+		if (internal.exists()) {
+			return internal;
+		}
+		return Gdx.files.classpath(path);
 	}
 
 	public static void dispose() {
